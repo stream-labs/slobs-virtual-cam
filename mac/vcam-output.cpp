@@ -138,6 +138,15 @@ static void receive_raw_video(void *param, struct video_data *frame)
 {
 	struct virtual_output *output = (virtual_output *)param;
 
+	struct obs_video_info ovi;
+	if (!obs_get_video_info(&ovi))
+		return;
+
+	if (ovi.base_width != output->VCAM->width ||
+		ovi.base_height != output->VCAM->height ||
+		ovi.fps_num != output->VCAM->fps)
+		return;
+
 	uint8_t *converted_frame[MAX_AV_PLANES];
 	uint32_t size = output->VCAM->width * output->VCAM->height * 2;
 	converted_frame[0] = (uint8_t *)bmalloc(size);
