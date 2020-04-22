@@ -53,4 +53,12 @@ target_link_libraries(
 	${FFMPEG_LIBRARIES}
 )
 
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/" DESTINATION "./data/obs-plugins/slobs-virtual-cam" USE_SOURCE_PERMISSIONS
+	FILES_MATCHING PATTERN "*.sh"
+	PATTERN "vcam-ipc" EXCLUDE
+	PATTERN "vcam-utils" EXCLUDE
+	PATTERN "vcam-plugin" EXCLUDE
+	PATTERN "vcam-assistant" EXCLUDE
+	PATTERN "data" EXCLUDE)
+
 install_obs_plugin_with_data(slobs-virtual-cam data)

@@ -69,4 +69,6 @@ install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION "./data/obs-plugins/slobs-virtual-cam" COMPONENT Runtime
 )
 
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/" DESTINATION "./data/obs-plugins/slobs-virtual-cam" FILES_MATCHING PATTERN "*.plist")
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/" DESTINATION "./data/obs-plugins/slobs-virtual-cam" FILES_MATCHING PATTERN "*.plist"
+	PATTERN "include" EXCLUDE
+	PATTERN "src" EXCLUDE)
