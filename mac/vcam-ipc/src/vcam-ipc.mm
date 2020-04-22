@@ -384,6 +384,9 @@ bool VCAM_IPC::loadDaemon()
     auto daemonsPath = replace(vcam_agent_path, "~", this->homePath());
     auto dstDaemonsPath = daemonsPath + "/" + vcam_agent + ".plist";
 
+    if (!this->mkpath(daemonsPath))
+        return false;
+
     if (!this->fileExists(dstDaemonsPath)) {
         std::cout << "Daemon file plist doesn't exist" << std::endl;
         return createDaemonPlist(dstDaemonsPath);
