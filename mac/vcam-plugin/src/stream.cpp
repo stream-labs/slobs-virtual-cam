@@ -184,6 +184,9 @@ void Stream::frameReady(const uint8_t * data)
     if (!this->m_running)
         return;
 
+    if (!data)
+        Print("Stream::frameReady Null data");
+
     this->m_mutex.lock();
     this->m_currentData = data;
     this->m_mutex.unlock();
@@ -283,6 +286,9 @@ void Stream::streamLoop(CFRunLoopTimerRef timer, void *info)
 {
     auto self = reinterpret_cast<Stream *>(info);
 
+    Print("Stream::streamLoop");
+    Print("Stream::streamLoop, is Running: ", self->m_running);
+
     if (!self->m_running)
         return;
 
@@ -293,6 +299,7 @@ void Stream::streamLoop(CFRunLoopTimerRef timer, void *info)
 
 void Stream::sendFrame(const uint8_t * data)
 {
+    Print("Stream::sendFrame");
     if (CMSimpleQueueGetFullness(this->m_queue)  >= 1.0f)
         return;
 
@@ -332,15 +339,22 @@ void Stream::sendFrame(const uint8_t * data)
                         nullptr,
                         &imageBuffer);
 
+    Print("Stream::sendFrame, fps: ", fps);
+    Print("Stream::sendFrame, fi.width: ", fi.width);
+    Print("Stream::sendFrame, fi.height: ", fi.height);
+    Print("Stream::sendFrame, fi.pix_format: ", fi.pix_format);
+
     if (!imageBuffer)
         return;
 
     CVPixelBufferLockBaseAddress(imageBuffer, 0);
     auto data2 = CVPixelBufferGetBaseAddress(imageBuffer);
+    if (!data || !data2) // No valid data to render
+        return;
     memcpy(data2, data, fi.width * fi.height * BYTES_PER_PIXEL);
     CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
 
-    CMVideoFormatDescriptionRef format = nullptr;
+    CMVideoFormatDescriptionRef format = nullptr; // kCMPixelFormat_422YpCbCr8
     CMVideoFormatDescriptionCreateForImageBuffer(kCFAllocatorDefault,
                                                  imageBuffer,
                                                  &format);
@@ -366,7 +380,6 @@ void Stream::sendFrame(const uint8_t * data)
     CFRelease(imageBuffer);
 
     CMSimpleQueueEnqueue(this->m_queue, buffer);
-    
     this->m_pts = CMTimeAdd(this->m_pts, duration);
     this->m_sequence++;
 

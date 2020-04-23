@@ -252,14 +252,6 @@ bool ObjectProperties::setProperty(UInt32 property,
                         *static_cast<const CMFormatDescriptionRef *>(data);
                 auto mediaType = CMFormatDescriptionGetMediaSubType(videoDescription);
                 auto dimensions = CMVideoFormatDescriptionGetDimensions(videoDescription);
-                // this->m_properties[property].videoFormat =
-                //         VideoFormat(formatFromCM(mediaType),
-                //                     dimensions.width,
-                //                     dimensions.height);
-                // this->m_properties[property].videoFormat =
-                //         VideoFormat(kCMPixelFormat_422YpCbCr8,
-                //                     1280,
-                //                     720);
             } else {
                 ok = false;
             }

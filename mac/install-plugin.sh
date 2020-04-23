@@ -10,8 +10,6 @@ mkdir Resources
 cd ..
 cd ..
 
-echo $1
-
 cp $1/libvcam-plugin.dylib ./vcam-plugin.plugin/Contents/MacOS/vcam-plugin
 cp $1/vcam-assistant ./vcam-plugin.plugin/Contents/Resources/vcam-assistant
 

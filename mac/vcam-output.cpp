@@ -34,6 +34,8 @@ struct virtual_output {
 	struct SwsContext *scaler;
 };
 
+bool created = false;
+
 static const char *virtual_output_getname(void *unused)
 {
 	UNUSED_PARAMETER(unused);
@@ -50,6 +52,7 @@ static void *virtual_output_create(obs_data_t *settings, obs_output_t *output)
 	uint32_t height = 0;
 	double fps = 0.0;
 	bool res = false;
+	struct obs_video_info ovi;
 
 	name = obs_data_get_string(settings, "name");
 	if (!name)
@@ -86,9 +89,15 @@ static void *virtual_output_create(obs_data_t *settings, obs_output_t *output)
 	if (!res)
 		goto fail;
 
+	if (!obs_get_video_info(&ovi))
+		goto fail;
+
+	if (ovi.output_format != VIDEO_FORMAT_NV12)
+		goto fail;
+
 	data->scaler = 
-		sws_getContext(width,
-					height,
+		sws_getContext(ovi.output_width,
+					ovi.output_height,
 					AV_PIX_FMT_NV12,
 					width,
 					height,
@@ -99,6 +108,7 @@ static void *virtual_output_create(obs_data_t *settings, obs_output_t *output)
 		goto fail;
 
 	blog(LOG_INFO, "Virtual webcam created successfully");
+	created = true;
 	return data;
 
 fail:
@@ -114,7 +124,7 @@ static void virtual_output_destroy(void *data)
 		blog(LOG_ERROR, "Error when trying to remove the virtual webcam");
 
 	output->VCAM->removeDaemon();
-
+	created = false;
 	bfree(output);
 }
 
@@ -136,15 +146,13 @@ static void virtual_output_stop(void *data, uint64_t ts)
 
 static void receive_raw_video(void *param, struct video_data *frame)
 {
+	if (!created)
+		return;
+
 	struct virtual_output *output = (virtual_output *)param;
 
 	struct obs_video_info ovi;
 	if (!obs_get_video_info(&ovi))
-		return;
-
-	if (ovi.base_width != output->VCAM->width ||
-		ovi.base_height != output->VCAM->height ||
-		ovi.fps_num != output->VCAM->fps)
 		return;
 
 	uint8_t *converted_frame[MAX_AV_PLANES];
@@ -159,7 +167,7 @@ static void receive_raw_video(void *param, struct video_data *frame)
 		frame->data,
 		(const int *)frame->linesize,
 		0,
-		output->VCAM->height,
+		ovi.output_height,
 		converted_frame,
 		(const int *)dest_linesize
 	);
