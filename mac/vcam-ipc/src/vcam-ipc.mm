@@ -390,6 +390,8 @@ bool VCAM_IPC::loadDaemon()
     if (!this->fileExists(dstDaemonsPath)) {
         std::cout << "Daemon file plist doesn't exist" << std::endl;
         return createDaemonPlist(dstDaemonsPath);
+    } else {
+        Print("File exist, ", dstDaemonsPath.c_str());
     }
 
     auto launchctl = popen(("launchctl load -w '" + dstDaemonsPath + "'").c_str(),
