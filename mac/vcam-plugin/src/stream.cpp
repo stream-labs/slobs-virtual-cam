@@ -302,7 +302,7 @@ void Stream::stopTimer()
     // CFRelease(this->m_timer);
     // this->m_timer = nullptr;
 
-    stop_timer = false;
+    stop_timer = true;
     if (timer->joinable())
         timer->join();
 }
