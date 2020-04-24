@@ -249,7 +249,7 @@ void Stream::renderFrames()
     this->m_mutex.lock();
     sendFrame(this->m_currentData);
     this->m_mutex.unlock();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
 }
 
