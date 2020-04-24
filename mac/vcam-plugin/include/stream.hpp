@@ -40,6 +40,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "vcam-ipc-server.hpp"
 #include "object.hpp"
 
+#include <thread>
+
 class Stream;
 typedef std::shared_ptr<Stream> StreamPtr;
 
@@ -83,7 +85,10 @@ class Stream: public Object
         bool m_running {false};
         bool m_horizontalMirror {false};
         bool m_verticalMirror {false};
+        std::thread *timer;
+        bool stop_timer;
 
+        void renderFrames();
         bool startTimer();
         void stopTimer();
         static void streamLoop(CFRunLoopTimerRef timer, void *info);
