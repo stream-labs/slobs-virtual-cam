@@ -391,7 +391,7 @@ bool VCAM_IPC::loadDaemon()
     std::cout << "loadDaemon - 3" << std::endl;
 
     if (!this->fileExists(dstDaemonsPath)) {
-        this->mkpath(daemonsPath)
+        this->mkpath(daemonsPath);
         std::cout << "Daemon file plist doesn't exist" << std::endl;
         createDaemonPlist(dstDaemonsPath);
         std::cout << "loadDaemon - 4" << std::endl;
