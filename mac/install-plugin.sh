@@ -1,4 +1,4 @@
-rm -rf /tmp//vcam-plugin.plugin
+rm -rf /tmp/vcam-plugin.plugin
 mkdir /tmp/vcam-plugin.plugin
 cd /tmp/vcam-plugin.plugin
 
