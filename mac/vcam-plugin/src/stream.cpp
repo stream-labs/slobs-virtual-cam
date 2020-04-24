@@ -181,15 +181,20 @@ void Stream::frameReady(const uint8_t * data)
 {
     PrintFunction();
 
+    Print("Stream::frameReady - 0");
     if (!this->m_running)
         return;
 
+    Print("Stream::frameReady - 1");
     if (!data)
         Print("Stream::frameReady Null data");
 
     this->m_mutex.lock();
+    Print("Stream::frameReady - 2");
     this->m_currentData = data;
+    Print("Stream::frameReady - 3");
     this->m_mutex.unlock();
+    Print("Stream::frameReady - 4");
 }
 void Stream::setMirror(bool horizontalMirror, bool verticalMirror)
 {
@@ -238,48 +243,68 @@ OSStatus Stream::deckCueTo(Float64 frameNumber, Boolean playOnCue)
     return kCMIOHardwareUnspecifiedError;
 }
 
+void Stream::renderFrames()
+{
+  while (!stop_timer) {
+    this->m_mutex.lock();
+    sendFrame(this->m_currentData);
+    this->m_mutex.unlock();
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+}
+
 bool Stream::startTimer()
 {
 
-    if (this->m_timer)
-        return false;
+    // if (this->m_timer)
+    //     return false;
 
-    Float64 fps = 0;
-    this->m_properties.getProperty(kCMIOStreamPropertyFrameRate, &fps);
+    // Float64 fps = 0;
+    // this->m_properties.getProperty(kCMIOStreamPropertyFrameRate, &fps);
 
-    CFTimeInterval interval = 1.0 / fps;
-    CFRunLoopTimerContext context {0, this, nullptr, nullptr, nullptr};
-    this->m_timer =
-            CFRunLoopTimerCreate(kCFAllocatorDefault,
-                                 0.0,
-                                 interval,
-                                 0,
-                                 0,
-                                 Stream::streamLoop,
-                                 &context);
+    // CFTimeInterval interval = 1.0 / 60.0;
+    // CFRunLoopTimerContext context {0, this, nullptr, nullptr, nullptr};
+    // this->m_timer =
+    //         CFRunLoopTimerCreate(kCFAllocatorDefault,
+    //                              0.0,
+    //                              interval,
+    //                              0,
+    //                              0,
+    //                              Stream::streamLoop,
+    //                              &context);
 
-    if (!this->m_timer)
-        return false;
+    // if (!this->m_timer)
+    //     return false;
 
-    CFRunLoopAddTimer(CFRunLoopGetMain(),
-                      this->m_timer,
-                      kCFRunLoopCommonModes);
+    // Print("start timmer now");
+    // CFRunLoopAddTimer(CFRunLoopGetMain(),
+    //                   this->m_timer,
+    //                   kCFRunLoopCommonModes);
+
+    // Print("start timmer now - end");
+
+    stop_timer = false;
+    timer = new std::thread(&Stream::renderFrames, this);
 
     return true;
 }
 
 void Stream::stopTimer()
 {
-    PrintFunction();
-    if (!this->m_timer)
-        return;
+    // PrintFunction();
+    // if (!this->m_timer)
+    //     return;
 
-    CFRunLoopTimerInvalidate(this->m_timer);
-    CFRunLoopRemoveTimer(CFRunLoopGetMain(),
-                         this->m_timer,
-                         kCFRunLoopCommonModes);
-    CFRelease(this->m_timer);
-    this->m_timer = nullptr;
+    // CFRunLoopTimerInvalidate(this->m_timer);
+    // CFRunLoopRemoveTimer(CFRunLoopGetMain(),
+    //                      this->m_timer,
+    //                      kCFRunLoopCommonModes);
+    // CFRelease(this->m_timer);
+    // this->m_timer = nullptr;
+
+    stop_timer = false;
+    if (timer->joinable())
+        timer->join();
 }
 
 void Stream::streamLoop(CFRunLoopTimerRef timer, void *info)
@@ -295,22 +320,27 @@ void Stream::streamLoop(CFRunLoopTimerRef timer, void *info)
     self->m_mutex.lock();
     self->sendFrame(self->m_currentData);
     self->m_mutex.unlock();
+    Print("Stream::streamLoop - end");
 }
 
 void Stream::sendFrame(const uint8_t * data)
 {
     Print("Stream::sendFrame");
+    Print("Stream::sendFrame - 0");
     if (CMSimpleQueueGetFullness(this->m_queue)  >= 1.0f)
         return;
 
+    Print("Stream::sendFrame - 1");
     bool resync = false;
     auto hostTime = CFAbsoluteTimeGetCurrent();
     auto pts = CMTimeMake(int64_t(hostTime), 1e9);
     auto ptsDiff = CMTimeGetSeconds(CMTimeSubtract(this->m_pts, pts));
 
+    Print("Stream::sendFrame - 2");
     if (CMTimeCompare(pts, this->m_pts) == 0)
         return;
 
+    Print("Stream::sendFrame - 3");
     FrameInfo fi;
     Float64 fps;
 
@@ -344,17 +374,20 @@ void Stream::sendFrame(const uint8_t * data)
     Print("Stream::sendFrame, fi.height: ", fi.height);
     Print("Stream::sendFrame, fi.pix_format: ", fi.pix_format);
 
+    Print("Stream::sendFrame - 4");
     if (!imageBuffer)
         return;
 
+    Print("Stream::sendFrame - 5");
     CVPixelBufferLockBaseAddress(imageBuffer, 0);
     auto data2 = CVPixelBufferGetBaseAddress(imageBuffer);
     if (!data || !data2) // No valid data to render
         return;
+    Print("Stream::sendFrame - 6");
     memcpy(data2, data, fi.width * fi.height * BYTES_PER_PIXEL);
     CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
 
-    CMVideoFormatDescriptionRef format = nullptr; // kCMPixelFormat_422YpCbCr8
+    CMVideoFormatDescriptionRef format = nullptr;
     CMVideoFormatDescriptionCreateForImageBuffer(kCFAllocatorDefault,
                                                  imageBuffer,
                                                  &format);
@@ -366,6 +399,7 @@ void Stream::sendFrame(const uint8_t * data)
         this->m_pts
     };
 
+    Print("Stream::sendFrame - 7");
     CMSampleBufferRef buffer = nullptr;
     CMIOSampleBufferCreateForImageBuffer(kCFAllocatorDefault,
                                          imageBuffer,
@@ -382,9 +416,11 @@ void Stream::sendFrame(const uint8_t * data)
     CMSimpleQueueEnqueue(this->m_queue, buffer);
     this->m_pts = CMTimeAdd(this->m_pts, duration);
     this->m_sequence++;
+    Print("Stream::sendFrame - 8");
 
     if (this->m_queueAltered)
         this->m_queueAltered(this->m_objectID,
                              buffer,
                              this->m_queueAlteredRefCon);
+    Print("Stream::sendFrame end");
 }
