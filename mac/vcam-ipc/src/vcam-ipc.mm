@@ -381,20 +381,20 @@ bool createDaemonPlist(const std::string &fileName)
 
 bool VCAM_IPC::loadDaemon()
 {
-    std::cout << "loadDaemon - 0";
+    std::cout << "loadDaemon - 0" << std::endl;
     auto daemonsPath = replace(vcam_agent_path, "~", this->homePath());
-    std::cout << "loadDaemon - 1";
+    std::cout << "loadDaemon - 1" << std::endl;
     auto dstDaemonsPath = daemonsPath + "/" + vcam_agent + ".plist";
-    std::cout << "loadDaemon - 2";
+    std::cout << "loadDaemon - 2" << std::endl;
 
-    if (!this->mkpath(daemonsPath))
-        return false;
-    std::cout << "loadDaemon - 3";
+
+    std::cout << "loadDaemon - 3" << std::endl;
 
     if (!this->fileExists(dstDaemonsPath)) {
+        this->mkpath(daemonsPath)
         std::cout << "Daemon file plist doesn't exist" << std::endl;
         createDaemonPlist(dstDaemonsPath);
-        std::cout << "loadDaemon - 4";
+        std::cout << "loadDaemon - 4" << std::endl;
     }
 
     auto launchctl = popen(("launchctl load -w '" + dstDaemonsPath + "'").c_str(),
