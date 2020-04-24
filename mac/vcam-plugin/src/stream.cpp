@@ -323,6 +323,20 @@ void Stream::streamLoop(CFRunLoopTimerRef timer, void *info)
     Print("Stream::streamLoop - end");
 }
 
+void doHorrizontalMirror(uint32_t height, uint32_t width, const uint8_t * source,
+    uint8_t *dest)
+{
+    int linesize = width * 2;
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < linesize; x+=4) {
+            dest[y*linesize + x] = source[y*linesize + linesize - x];
+            dest[y*linesize + x + 1] = source[y*linesize + linesize - x - 1];
+            dest[y*linesize + x + 2] = source[y*linesize + linesize - x - 2];
+            dest[y*linesize + x + 3] = source[y*linesize + linesize - x - 3];
+        }
+    }
+}
+
 void Stream::sendFrame(const uint8_t * data)
 {
     Print("Stream::sendFrame");
@@ -384,7 +398,13 @@ void Stream::sendFrame(const uint8_t * data)
     if (!data || !data2) // No valid data to render
         return;
     Print("Stream::sendFrame - 6");
-    memcpy(data2, data, fi.width * fi.height * BYTES_PER_PIXEL);
+
+
+    if(this->m_horizontalMirror)
+        doHorrizontalMirror(fi.height, fi.width, data, (uint8_t *)data2);
+    else
+        memcpy(data2, data, fi.width * fi.height * BYTES_PER_PIXEL);
+
     CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
 
     CMVideoFormatDescriptionRef format = nullptr;
