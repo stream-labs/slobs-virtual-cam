@@ -107,6 +107,8 @@ static void *virtual_output_create(obs_data_t *settings, obs_output_t *output)
 	if (!data->scaler)
 		goto fail;
 
+	data->VCAM->setHorizontalMirroring(false);
+
 	blog(LOG_INFO, "Virtual webcam created successfully");
 	created = true;
 	return data;
@@ -175,6 +177,13 @@ static void receive_raw_video(void *param, struct video_data *frame)
 	output->VCAM->uploadFrame((const uint8_t *)converted_frame[0]);
 }
 
+static void virtual_output_update(void *data, obs_data_t *settings)
+{
+	struct virtual_output *output = (virtual_output *)data;
+	bool state = obs_data_get_bool(settings, "mirroring");
+	output->VCAM->setHorizontalMirroring(state);
+}
+
 struct obs_output_info virtual_output = {
 	.id = "virtual_output",
 	.flags = OBS_OUTPUT_VIDEO,
@@ -183,7 +192,8 @@ struct obs_output_info virtual_output = {
 	.destroy = virtual_output_destroy,
 	.start = virtual_output_start,
 	.stop = virtual_output_stop,
-	.raw_video = receive_raw_video
+	.raw_video = receive_raw_video,
+	.update = virtual_output_update
 };
 
 OBS_DECLARE_MODULE()

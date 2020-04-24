@@ -353,6 +353,9 @@ void Assistant::setMirroring(xpc_connection_t client,
     bool verticalMirror = xpc_dictionary_get_bool(event, "vmirror");
     bool ok = false;
 
+    Print("Assistant received set mirroring");
+    Print("horizontalMirror ", horizontalMirror);
+
     if (this->m_deviceConfigs.count(deviceId) > 0)
         if (this->m_deviceConfigs[deviceId].horizontalMirror != horizontalMirror
             || this->m_deviceConfigs[deviceId].verticalMirror != verticalMirror) {

@@ -73,6 +73,8 @@ class VirtualCam
 
         bool     startDaemon();
         bool     removeDaemon();
+
+        void setHorizontalMirroring(bool state);
 };
 
 #endif

@@ -119,3 +119,8 @@ bool VirtualCam::uploadFrame(const uint8_t *frame)
         frame,
         size);
 }
+
+void VirtualCam::setHorizontalMirroring(bool state)
+{
+    this->ipc_client.setMirroring(this->deviceID, state, true);
+}
