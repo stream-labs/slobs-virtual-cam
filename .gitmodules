@@ -1,0 +1,3 @@
+[submodule "windows/obs-virtual-cam"]
+	path = windows/obs-virtual-cam
+	url = https://github.com/stream-labs/obs-virtual-cam.git
