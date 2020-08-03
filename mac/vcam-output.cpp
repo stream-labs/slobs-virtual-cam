@@ -175,6 +175,7 @@ static void receive_raw_video(void *param, struct video_data *frame)
 	);
 
 	output->VCAM->uploadFrame((const uint8_t *)converted_frame[0]);
+	bfree(converted_frame[0]);
 }
 
 static void virtual_output_update(void *data, obs_data_t *settings)
