@@ -32,7 +32,7 @@ static std::string vcam_plugin_path    = "/Library/CoreMediaIO/Plug-Ins/DAL";
 static std::string vcam_plugin         = "vcam-plugin";
 static std::string vcam_agent_path     = "~/Library/LaunchAgents";
 static std::string vcam_vendor         = "Streamlabs";
-static std::string vcam_product        = "Streamlabs OBS";
+static std::string vcam_product        = "Streamlabs Desktop";
 
 static uint8_t BYTES_PER_PIXEL = 2;
 

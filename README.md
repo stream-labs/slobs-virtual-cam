@@ -1,2 +1,2 @@
 # slobs-virtual-cam
-Streamlabs OBS cross-platform virtual camera plugin
+Streamlabs Desktop cross-platform virtual camera plugin
