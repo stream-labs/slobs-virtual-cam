@@ -42,43 +42,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
 
-#define VCAM_CALLBACK(CallbackName, ...) \
-    using CallbackName##CallbackT = void (*)(void *userData, __VA_ARGS__); \
-    using CallbackName##Callback = std::pair<void *, CallbackName##CallbackT>;
+#define VCAM_CALLBACK(CallbackName, ...)                                       \
+	using CallbackName##CallbackT = void (*)(void *userData, __VA_ARGS__); \
+	using CallbackName##Callback = std::pair<void *, CallbackName##CallbackT>;
 
-#define VCAM_CALLBACK_NOARGS(CallbackName) \
-    using CallbackName##CallbackT = void (*)(void *userData); \
-    using CallbackName##Callback = std::pair<void *, CallbackName##CallbackT>;
+#define VCAM_CALLBACK_NOARGS(CallbackName)                        \
+	using CallbackName##CallbackT = void (*)(void *userData); \
+	using CallbackName##Callback = std::pair<void *, CallbackName##CallbackT>;
 
 #define StartLogging(...) Logger::start(__VA_ARGS__)
 #define Print(...) Logger::log(__VA_ARGS__)
 #define StopLogging() Logger::stop()
 
-namespace Logger
+namespace Logger {
+VCAM_CALLBACK(Log, const char *data, size_t size)
+
+void start(const std::string &fileName = std::string(), const std::string &extension = std::string());
+void start(LogCallback callback);
+std::string header();
+std::ostream &out();
+void log();
+void tlog();
+void stop();
+
+template<typename First, typename... Next> void tlog(const First &first, const Next &...next)
 {
-    VCAM_CALLBACK(Log, const char *data, size_t size)
+	out() << first;
+	tlog(next...);
+}
 
-    void start(const std::string &fileName=std::string(),
-                const std::string &extension=std::string());
-    void start(LogCallback callback);
-    std::string header();
-    std::ostream &out();
-    void log();
-    void tlog();
-    void stop();
-
-    template<typename First, typename... Next>
-    void tlog(const First &first, const Next &... next)
-    {
-        out() << first;
-        tlog(next...);
-    }
-
-    template<typename... Param>
-    void log(const Param &... param)
-    {
-        tlog(header(), " ", param...);
-    }
+template<typename... Param> void log(const Param &...param)
+{
+	tlog(header(), " ", param...);
+}
 }
 
 #endif

@@ -53,128 +53,84 @@ class ObjectPropertiesPrivate;
 class Object;
 typedef std::shared_ptr<Object> ObjectPtr;
 
-enum PropertyType
-{
-    PropertyTypeUInt32,
-    PropertyTypeFloat64,
-    PropertyTypePidT,
-    PropertyTypeString,
-    PropertyTypeWString,
-    PropertyTypeObjectVector,
-    PropertyTypeObjectPtrVector,
-    PropertyTypeVideoFormat,
-    PropertyTypeVideoFormatVector,
-    PropertyTypeFloat64Vector,
-    PropertyTypeAudioValueRangeVector,
-    PropertyTypeClock,
-    PropertyTypeAddress
+enum PropertyType {
+	PropertyTypeUInt32,
+	PropertyTypeFloat64,
+	PropertyTypePidT,
+	PropertyTypeString,
+	PropertyTypeWString,
+	PropertyTypeObjectVector,
+	PropertyTypeObjectPtrVector,
+	PropertyTypeVideoFormat,
+	PropertyTypeVideoFormatVector,
+	PropertyTypeFloat64Vector,
+	PropertyTypeAudioValueRangeVector,
+	PropertyTypeClock,
+	PropertyTypeAddress
 };
 
-struct PropertyValue
-{
-    PropertyType type;
-    bool isSettable;
+struct PropertyValue {
+	PropertyType type;
+	bool isSettable;
 
-    union
-    {
-        UInt32 uint32;
-        Float64 float64;
-        pid_t pidT;
-    } num;
+	union {
+		UInt32 uint32;
+		Float64 float64;
+		pid_t pidT;
+	} num;
 
-    std::string str;
-    std::wstring wstr;
-    std::vector<Object *> objects;
-    std::vector<ObjectPtr> objectsPtr;
-    std::vector<FrameInfo> videoFormats;
-    std::vector<Float64> float64Vector;
-    std::vector<AudioValueRange> audioValueRangeVector;
-    FrameInfo videoFormat;
-    ClockPtr clock;
-    CMIOObjectPropertyAddress address;
+	std::string str;
+	std::wstring wstr;
+	std::vector<Object *> objects;
+	std::vector<ObjectPtr> objectsPtr;
+	std::vector<FrameInfo> videoFormats;
+	std::vector<Float64> float64Vector;
+	std::vector<AudioValueRange> audioValueRangeVector;
+	FrameInfo videoFormat;
+	ClockPtr clock;
+	CMIOObjectPropertyAddress address;
 };
 
-class ObjectProperties
-{
-    public:
-        ObjectProperties();
-        ObjectProperties(const ObjectProperties &other);
-        ObjectProperties &operator =(const ObjectProperties &other);
-        virtual ~ObjectProperties();
+class ObjectProperties {
+public:
+	ObjectProperties();
+	ObjectProperties(const ObjectProperties &other);
+	ObjectProperties &operator=(const ObjectProperties &other);
+	virtual ~ObjectProperties();
 
-        std::vector<UInt32> properties() const;
+	std::vector<UInt32> properties() const;
 
-        // Set properties
-        bool setProperty(UInt32 property,
-                            const std::string &value,
-                            bool isSettable=true);
-        bool setProperty(UInt32 property,
-                            const std::wstring &value,
-                            bool isSettable=true);
-        bool setProperty(UInt32 property,
-                            UInt32 value,
-                            bool isSettable=true);
-        bool setProperty(UInt32 property,
-                            Float64 value,
-                            bool isSettable=true);
-        bool setProperty(UInt32 property,
-                            pid_t value,
-                            bool isSettable=true);
-        bool setProperty(UInt32 property,
-                            const std::vector<Object *> &value,
-                            bool isSettable=true);
-        bool setProperty(UInt32 property,
-                            const std::vector<ObjectPtr> &value,
-                            bool isSettable=true);
-        bool setProperty(UInt32 property,
-                            const FrameInfo &value,
-                            bool isSettable=true);
-        bool setProperty(UInt32 property,
-                            const std::vector<FrameInfo> &value,
-                            bool isSettable=true);
-        bool setProperty(UInt32 property,
-                            const std::vector<Float64> &value,
-                            bool isSettable=true);
-        bool setProperty(UInt32 property,
-                            const std::vector<AudioValueRange> &value,
-                            bool isSettable=true);
-        bool setProperty(UInt32 property,
-                            const ClockPtr &value,
-                            bool isSettable=true);
-        bool setProperty(UInt32 property,
-                            const CMIOObjectPropertyAddress &value,
-                            bool isSettable=true);
-        bool setProperty(UInt32 property,
-                            UInt32 dataSize,
-                            const void *data);
+	// Set properties
+	bool setProperty(UInt32 property, const std::string &value, bool isSettable = true);
+	bool setProperty(UInt32 property, const std::wstring &value, bool isSettable = true);
+	bool setProperty(UInt32 property, UInt32 value, bool isSettable = true);
+	bool setProperty(UInt32 property, Float64 value, bool isSettable = true);
+	bool setProperty(UInt32 property, pid_t value, bool isSettable = true);
+	bool setProperty(UInt32 property, const std::vector<Object *> &value, bool isSettable = true);
+	bool setProperty(UInt32 property, const std::vector<ObjectPtr> &value, bool isSettable = true);
+	bool setProperty(UInt32 property, const FrameInfo &value, bool isSettable = true);
+	bool setProperty(UInt32 property, const std::vector<FrameInfo> &value, bool isSettable = true);
+	bool setProperty(UInt32 property, const std::vector<Float64> &value, bool isSettable = true);
+	bool setProperty(UInt32 property, const std::vector<AudioValueRange> &value, bool isSettable = true);
+	bool setProperty(UInt32 property, const ClockPtr &value, bool isSettable = true);
+	bool setProperty(UInt32 property, const CMIOObjectPropertyAddress &value, bool isSettable = true);
+	bool setProperty(UInt32 property, UInt32 dataSize, const void *data);
 
-        // Get properties
-        bool getProperty(UInt32 property,
-                            UInt32 *value);
-        bool getProperty(UInt32 property,
-                            Float64 *value);
-        bool getProperty(UInt32 property,
-                            std::string *value);
-        bool getProperty(UInt32 property,
-                            FrameInfo *value);
-        bool getProperty(UInt32 property,
-                            UInt32 qualifierDataSize=0,
-                            const void *qualifierData=nullptr,
-                            UInt32 dataSize=0,
-                            UInt32 *dataUsed=nullptr,
-                            void *data=nullptr);
+	// Get properties
+	bool getProperty(UInt32 property, UInt32 *value);
+	bool getProperty(UInt32 property, Float64 *value);
+	bool getProperty(UInt32 property, std::string *value);
+	bool getProperty(UInt32 property, FrameInfo *value);
+	bool getProperty(UInt32 property, UInt32 qualifierDataSize = 0, const void *qualifierData = nullptr, UInt32 dataSize = 0, UInt32 *dataUsed = nullptr, void *data = nullptr);
 
-        void removeProperty(UInt32 property);
-        void update(const ObjectProperties &other);
-        bool isSettable(UInt32 property);
+	void removeProperty(UInt32 property);
+	void update(const ObjectProperties &other);
+	bool isSettable(UInt32 property);
 
-    private:
-        std::map<UInt32, PropertyValue> m_properties;
+private:
+	std::map<UInt32, PropertyValue> m_properties;
 
-    protected:
-        virtual bool qualify(UInt32 property,
-                                UInt32 qualifierDataSize,
-                                const void *qualifierData,
-                                const void *data);
+protected:
+	virtual bool qualify(UInt32 property, UInt32 qualifierDataSize, const void *qualifierData, const void *data);
 };
 #endif

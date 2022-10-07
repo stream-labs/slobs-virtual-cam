@@ -30,7 +30,7 @@ extern "C" {
 
 struct virtual_output {
 	obs_output_t *output;
-	VirtualCam* VCAM = nullptr;
+	VirtualCam *VCAM = nullptr;
 	struct SwsContext *scaler;
 };
 
@@ -75,17 +75,8 @@ static void *virtual_output_create(obs_data_t *settings, obs_output_t *output)
 		goto fail;
 
 	data->VCAM->removeAllWebcams();
-	blog(LOG_INFO, "Creating Virtual webcam: %s, %d, %d, %d",
-		name,
-		width,
-		height,
-		(int) fps);
-	res = data->VCAM->createWebcam(
-		name,
-		width,
-		height,
-		fps
-	);
+	blog(LOG_INFO, "Creating Virtual webcam: %s, %d, %d, %d", name, width, height, (int)fps);
+	res = data->VCAM->createWebcam(name, width, height, fps);
 	if (!res)
 		goto fail;
 
@@ -95,15 +86,7 @@ static void *virtual_output_create(obs_data_t *settings, obs_output_t *output)
 	if (ovi.output_format != VIDEO_FORMAT_NV12)
 		goto fail;
 
-	data->scaler = 
-		sws_getContext(ovi.output_width,
-					ovi.output_height,
-					AV_PIX_FMT_NV12,
-					width,
-					height,
-					AV_PIX_FMT_UYVY422,
-					SWS_BICUBIC, NULL, NULL, NULL
-	);
+	data->scaler = sws_getContext(ovi.output_width, ovi.output_height, AV_PIX_FMT_NV12, width, height, AV_PIX_FMT_UYVY422, SWS_BICUBIC, NULL, NULL, NULL);
 	if (!data->scaler)
 		goto fail;
 
@@ -164,15 +147,7 @@ static void receive_raw_video(void *param, struct video_data *frame)
 	uint32_t dest_linesize[MAX_AV_PLANES];
 	dest_linesize[0] = output->VCAM->width * 2;
 
-	int hightOutput = sws_scale(
-		output->scaler,
-		frame->data,
-		(const int *)frame->linesize,
-		0,
-		ovi.output_height,
-		converted_frame,
-		(const int *)dest_linesize
-	);
+	int hightOutput = sws_scale(output->scaler, frame->data, (const int *)frame->linesize, 0, ovi.output_height, converted_frame, (const int *)dest_linesize);
 
 	output->VCAM->uploadFrame((const uint8_t *)converted_frame[0]);
 	bfree(converted_frame[0]);
@@ -185,17 +160,15 @@ static void virtual_output_update(void *data, obs_data_t *settings)
 	output->VCAM->setHorizontalMirroring(state);
 }
 
-struct obs_output_info virtual_output = {
-	.id = "virtual_output",
-	.flags = OBS_OUTPUT_VIDEO,
-	.get_name = virtual_output_getname,
-	.create = virtual_output_create,
-	.destroy = virtual_output_destroy,
-	.start = virtual_output_start,
-	.stop = virtual_output_stop,
-	.raw_video = receive_raw_video,
-	.update = virtual_output_update
-};
+struct obs_output_info virtual_output = {.id = "virtual_output",
+					 .flags = OBS_OUTPUT_VIDEO,
+					 .get_name = virtual_output_getname,
+					 .create = virtual_output_create,
+					 .destroy = virtual_output_destroy,
+					 .start = virtual_output_start,
+					 .stop = virtual_output_stop,
+					 .raw_video = receive_raw_video,
+					 .update = virtual_output_update};
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-virtual-output", "en-US")

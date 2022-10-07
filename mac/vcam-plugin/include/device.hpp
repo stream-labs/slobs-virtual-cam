@@ -48,37 +48,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class Device;
 typedef std::shared_ptr<Device> DevicePtr;
 
-class Device: public Object
-{
-    public:
-        Device(CMIOHardwarePlugInRef pluginInterface,
-                bool createObject=false);
-        ~Device();
+class Device : public Object {
+public:
+	Device(CMIOHardwarePlugInRef pluginInterface, bool createObject = false);
+	~Device();
 
-        OSStatus createObject();
-        OSStatus registerObject(bool regist=true);
-        StreamPtr addStream();
-        std::list<StreamPtr> addStreams(int n);
-        OSStatus registerStreams(bool regist=true);
-        std::string deviceId() const;
-        void setDeviceId(const std::string &deviceId);
-        void stopStreams();
+	OSStatus createObject();
+	OSStatus registerObject(bool regist = true);
+	StreamPtr addStream();
+	std::list<StreamPtr> addStreams(int n);
+	OSStatus registerStreams(bool regist = true);
+	std::string deviceId() const;
+	void setDeviceId(const std::string &deviceId);
+	void stopStreams();
 
-        void frameReady(const uint8_t *data);
-        void setMirror(bool horizontalMirror, bool verticalMirror);
+	void frameReady(const uint8_t *data);
+	void setMirror(bool horizontalMirror, bool verticalMirror);
 
-        // Device Interface
-        OSStatus suspend();
-        OSStatus resume();
-        OSStatus startStream(CMIOStreamID stream);
-        OSStatus stopStream(CMIOStreamID stream);
-        OSStatus processAVCCommand(CMIODeviceAVCCommand *ioAVCCommand);
-        OSStatus processRS422Command(CMIODeviceRS422Command *ioRS422Command);
+	// Device Interface
+	OSStatus suspend();
+	OSStatus resume();
+	OSStatus startStream(CMIOStreamID stream);
+	OSStatus stopStream(CMIOStreamID stream);
+	OSStatus processAVCCommand(CMIODeviceAVCCommand *ioAVCCommand);
+	OSStatus processRS422Command(CMIODeviceRS422Command *ioRS422Command);
 
-    private:
-        std::string m_deviceId;
-        std::map<CMIOObjectID, StreamPtr> m_streams;
+private:
+	std::string m_deviceId;
+	std::map<CMIOObjectID, StreamPtr> m_streams;
 
-        void updateStreamsProperty();
+	void updateStreamsProperty();
 };
 #endif

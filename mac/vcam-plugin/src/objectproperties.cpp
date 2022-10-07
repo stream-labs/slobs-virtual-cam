@@ -42,636 +42,557 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "object.hpp"
 #include "util.h"
 
-ObjectProperties::ObjectProperties()
-{
-}
+ObjectProperties::ObjectProperties() {}
 
 ObjectProperties::ObjectProperties(const ObjectProperties &other)
 {
-    this->m_properties = other.m_properties;
+	this->m_properties = other.m_properties;
 }
 
-ObjectProperties &ObjectProperties::operator =(const ObjectProperties &other)
+ObjectProperties &ObjectProperties::operator=(const ObjectProperties &other)
 {
-    if (this != &other)
-        this->m_properties = other.m_properties;
+	if (this != &other)
+		this->m_properties = other.m_properties;
 
-    return *this;
+	return *this;
 }
 
-ObjectProperties::~ObjectProperties()
-{
-}
+ObjectProperties::~ObjectProperties() {}
 
 std::vector<UInt32> ObjectProperties::properties() const
 {
-    std::vector<UInt32> properties;
+	std::vector<UInt32> properties;
 
-    for (auto &property: this->m_properties)
-        properties.push_back(property.first);
+	for (auto &property : this->m_properties)
+		properties.push_back(property.first);
 
-    return properties;
+	return properties;
 }
 
-bool ObjectProperties::setProperty(UInt32 property,
-                                           const std::string &value,
-                                           bool isSettable)
+bool ObjectProperties::setProperty(UInt32 property, const std::string &value, bool isSettable)
 {
-    this->m_properties[property].type = PropertyTypeString;
-    this->m_properties[property].isSettable = isSettable;
-    this->m_properties[property].str = value;
+	this->m_properties[property].type = PropertyTypeString;
+	this->m_properties[property].isSettable = isSettable;
+	this->m_properties[property].str = value;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::setProperty(UInt32 property,
-                                           const std::wstring &value,
-                                           bool isSettable)
+bool ObjectProperties::setProperty(UInt32 property, const std::wstring &value, bool isSettable)
 {
-    this->m_properties[property].type = PropertyTypeWString;
-    this->m_properties[property].isSettable = isSettable;
-    this->m_properties[property].wstr = value;
+	this->m_properties[property].type = PropertyTypeWString;
+	this->m_properties[property].isSettable = isSettable;
+	this->m_properties[property].wstr = value;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::setProperty(UInt32 property,
-                                           UInt32 value,
-                                           bool isSettable)
+bool ObjectProperties::setProperty(UInt32 property, UInt32 value, bool isSettable)
 {
-    this->m_properties[property].type = PropertyTypeUInt32;
-    this->m_properties[property].isSettable = isSettable;
-    this->m_properties[property].num.uint32 = value;
+	this->m_properties[property].type = PropertyTypeUInt32;
+	this->m_properties[property].isSettable = isSettable;
+	this->m_properties[property].num.uint32 = value;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::setProperty(UInt32 property,
-                                           Float64 value,
-                                           bool isSettable)
+bool ObjectProperties::setProperty(UInt32 property, Float64 value, bool isSettable)
 {
-    this->m_properties[property].type = PropertyTypeFloat64;
-    this->m_properties[property].isSettable = isSettable;
-    this->m_properties[property].num.float64 = value;
+	this->m_properties[property].type = PropertyTypeFloat64;
+	this->m_properties[property].isSettable = isSettable;
+	this->m_properties[property].num.float64 = value;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::setProperty(UInt32 property,
-                                           pid_t value,
-                                           bool isSettable)
+bool ObjectProperties::setProperty(UInt32 property, pid_t value, bool isSettable)
 {
-    this->m_properties[property].type = PropertyTypePidT;
-    this->m_properties[property].isSettable = isSettable;
-    this->m_properties[property].num.pidT = value;
+	this->m_properties[property].type = PropertyTypePidT;
+	this->m_properties[property].isSettable = isSettable;
+	this->m_properties[property].num.pidT = value;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::setProperty(UInt32 property,
-                                           const std::vector<Object *> &value,
-                                           bool isSettable)
+bool ObjectProperties::setProperty(UInt32 property, const std::vector<Object *> &value, bool isSettable)
 {
-    this->m_properties[property].type = PropertyTypeObjectVector;
-    this->m_properties[property].isSettable = isSettable;
-    this->m_properties[property].objects = value;
+	this->m_properties[property].type = PropertyTypeObjectVector;
+	this->m_properties[property].isSettable = isSettable;
+	this->m_properties[property].objects = value;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::setProperty(UInt32 property,
-                                           const std::vector<ObjectPtr> &value,
-                                           bool isSettable)
+bool ObjectProperties::setProperty(UInt32 property, const std::vector<ObjectPtr> &value, bool isSettable)
 {
-    this->m_properties[property].type = PropertyTypeObjectPtrVector;
-    this->m_properties[property].isSettable = isSettable;
-    this->m_properties[property].objectsPtr = value;
+	this->m_properties[property].type = PropertyTypeObjectPtrVector;
+	this->m_properties[property].isSettable = isSettable;
+	this->m_properties[property].objectsPtr = value;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::setProperty(UInt32 property,
-                                           const FrameInfo &value,
-                                           bool isSettable)
+bool ObjectProperties::setProperty(UInt32 property, const FrameInfo &value, bool isSettable)
 {
-    this->m_properties[property].type = PropertyTypeVideoFormat;
-    this->m_properties[property].isSettable = isSettable;
-    this->m_properties[property].videoFormat = value;
+	this->m_properties[property].type = PropertyTypeVideoFormat;
+	this->m_properties[property].isSettable = isSettable;
+	this->m_properties[property].videoFormat = value;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::setProperty(UInt32 property,
-                                           const std::vector<FrameInfo> &value,
-                                           bool isSettable)
+bool ObjectProperties::setProperty(UInt32 property, const std::vector<FrameInfo> &value, bool isSettable)
 {
-    this->m_properties[property].type = PropertyTypeVideoFormatVector;
-    this->m_properties[property].isSettable = isSettable;
-    this->m_properties[property].videoFormats = value;
+	this->m_properties[property].type = PropertyTypeVideoFormatVector;
+	this->m_properties[property].isSettable = isSettable;
+	this->m_properties[property].videoFormats = value;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::setProperty(UInt32 property,
-                                           const std::vector<Float64> &value,
-                                           bool isSettable)
+bool ObjectProperties::setProperty(UInt32 property, const std::vector<Float64> &value, bool isSettable)
 {
-    this->m_properties[property].type = PropertyTypeFloat64Vector;
-    this->m_properties[property].isSettable = isSettable;
-    this->m_properties[property].float64Vector = value;
+	this->m_properties[property].type = PropertyTypeFloat64Vector;
+	this->m_properties[property].isSettable = isSettable;
+	this->m_properties[property].float64Vector = value;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::setProperty(UInt32 property,
-                                           const std::vector<AudioValueRange> &value,
-                                           bool isSettable)
+bool ObjectProperties::setProperty(UInt32 property, const std::vector<AudioValueRange> &value, bool isSettable)
 {
-    this->m_properties[property].type = PropertyTypeAudioValueRangeVector;
-    this->m_properties[property].isSettable = isSettable;
-    this->m_properties[property].audioValueRangeVector = value;
+	this->m_properties[property].type = PropertyTypeAudioValueRangeVector;
+	this->m_properties[property].isSettable = isSettable;
+	this->m_properties[property].audioValueRangeVector = value;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::setProperty(UInt32 property,
-                                           const ClockPtr &value,
-                                           bool isSettable)
+bool ObjectProperties::setProperty(UInt32 property, const ClockPtr &value, bool isSettable)
 {
-    this->m_properties[property].type = PropertyTypeClock;
-    this->m_properties[property].isSettable = isSettable;
-    this->m_properties[property].clock = value;
+	this->m_properties[property].type = PropertyTypeClock;
+	this->m_properties[property].isSettable = isSettable;
+	this->m_properties[property].clock = value;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::setProperty(UInt32 property,
-                                           const CMIOObjectPropertyAddress &value,
-                                           bool isSettable)
+bool ObjectProperties::setProperty(UInt32 property, const CMIOObjectPropertyAddress &value, bool isSettable)
 {
-    this->m_properties[property].type = PropertyTypeAddress;
-    this->m_properties[property].isSettable = isSettable;
-    this->m_properties[property].address = value;
+	this->m_properties[property].type = PropertyTypeAddress;
+	this->m_properties[property].isSettable = isSettable;
+	this->m_properties[property].address = value;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::setProperty(UInt32 property,
-                                           UInt32 dataSize,
-                                           const void *data)
+bool ObjectProperties::setProperty(UInt32 property, UInt32 dataSize, const void *data)
 {
-    if (!this->m_properties.count(property))
-        return false;
+	if (!this->m_properties.count(property))
+		return false;
 
-    bool isSettable = this->m_properties[property].isSettable;
+	bool isSettable = this->m_properties[property].isSettable;
 
-    if (!isSettable)
-        return false;
+	if (!isSettable)
+		return false;
 
-    auto propertyType = this->m_properties[property].type;
-    bool ok = true;
+	auto propertyType = this->m_properties[property].type;
+	bool ok = true;
 
-    switch (propertyType) {
-        case PropertyTypeAddress:
-            if (dataSize == sizeof(CMIOObjectPropertyAddress)) {
-                this->m_properties[property].type = PropertyTypeAddress;
-                this->m_properties[property].isSettable = isSettable;
-                this->m_properties[property].address =
-                    *static_cast<const CMIOObjectPropertyAddress *>(data);
-            } else {
-                ok = false;
-            }
+	switch (propertyType) {
+	case PropertyTypeAddress:
+		if (dataSize == sizeof(CMIOObjectPropertyAddress)) {
+			this->m_properties[property].type = PropertyTypeAddress;
+			this->m_properties[property].isSettable = isSettable;
+			this->m_properties[property].address = *static_cast<const CMIOObjectPropertyAddress *>(data);
+		} else {
+			ok = false;
+		}
 
-            break;
+		break;
 
-        case PropertyTypeVideoFormat:
-            if (dataSize == sizeof(CMFormatDescriptionRef)) {
-                this->m_properties[property].type = PropertyTypeVideoFormat;
-                this->m_properties[property].isSettable = isSettable;
-                auto videoDescription =
-                        *static_cast<const CMFormatDescriptionRef *>(data);
-                auto mediaType = CMFormatDescriptionGetMediaSubType(videoDescription);
-                auto dimensions = CMVideoFormatDescriptionGetDimensions(videoDescription);
-            } else {
-                ok = false;
-            }
+	case PropertyTypeVideoFormat:
+		if (dataSize == sizeof(CMFormatDescriptionRef)) {
+			this->m_properties[property].type = PropertyTypeVideoFormat;
+			this->m_properties[property].isSettable = isSettable;
+			auto videoDescription = *static_cast<const CMFormatDescriptionRef *>(data);
+			auto mediaType = CMFormatDescriptionGetMediaSubType(videoDescription);
+			auto dimensions = CMVideoFormatDescriptionGetDimensions(videoDescription);
+		} else {
+			ok = false;
+		}
 
-            break;
+		break;
 
-        case PropertyTypeUInt32:
-            if (dataSize == sizeof(UInt32)) {
-                this->m_properties[property].type = PropertyTypeUInt32;
-                this->m_properties[property].isSettable = isSettable;
-                this->m_properties[property].num.uint32 =
-                    *static_cast<const UInt32 *>(data);
-            } else {
-                ok = false;
-            }
+	case PropertyTypeUInt32:
+		if (dataSize == sizeof(UInt32)) {
+			this->m_properties[property].type = PropertyTypeUInt32;
+			this->m_properties[property].isSettable = isSettable;
+			this->m_properties[property].num.uint32 = *static_cast<const UInt32 *>(data);
+		} else {
+			ok = false;
+		}
 
-            break;
+		break;
 
-        case PropertyTypeFloat64:
-            if (dataSize == sizeof(Float64)) {
-                this->m_properties[property].type = PropertyTypeFloat64;
-                this->m_properties[property].isSettable = isSettable;
-                this->m_properties[property].num.float64 =
-                    *static_cast<const Float64 *>(data);
-            } else {
-                ok = false;
-            }
+	case PropertyTypeFloat64:
+		if (dataSize == sizeof(Float64)) {
+			this->m_properties[property].type = PropertyTypeFloat64;
+			this->m_properties[property].isSettable = isSettable;
+			this->m_properties[property].num.float64 = *static_cast<const Float64 *>(data);
+		} else {
+			ok = false;
+		}
 
-            break;
+		break;
 
-        case PropertyTypePidT:
-            if (dataSize == sizeof(pid_t)) {
-                this->m_properties[property].type = PropertyTypePidT;
-                this->m_properties[property].isSettable = isSettable;
-                this->m_properties[property].num.pidT =
-                    *static_cast<const pid_t *>(data);
-            } else {
-                ok = false;
-            }
+	case PropertyTypePidT:
+		if (dataSize == sizeof(pid_t)) {
+			this->m_properties[property].type = PropertyTypePidT;
+			this->m_properties[property].isSettable = isSettable;
+			this->m_properties[property].num.pidT = *static_cast<const pid_t *>(data);
+		} else {
+			ok = false;
+		}
 
-            break;
+		break;
 
-        default:
-            return false;
-    }
+	default:
+		return false;
+	}
 
-    return ok;
+	return ok;
 }
 
 bool ObjectProperties::getProperty(UInt32 property, UInt32 *value)
 {
-    if (!value || !this->m_properties.count(property))
-        return false;
+	if (!value || !this->m_properties.count(property))
+		return false;
 
-    auto propertyType = this->m_properties[property].type;
+	auto propertyType = this->m_properties[property].type;
 
-    if (propertyType != PropertyTypeUInt32)
-        return false;
+	if (propertyType != PropertyTypeUInt32)
+		return false;
 
-    *value = this->m_properties[property].num.uint32;
+	*value = this->m_properties[property].num.uint32;
 
-    return true;
+	return true;
 }
 
 bool ObjectProperties::getProperty(UInt32 property, Float64 *value)
 {
-    if (!value || !this->m_properties.count(property))
-        return false;
+	if (!value || !this->m_properties.count(property))
+		return false;
 
-    auto propertyType = this->m_properties[property].type;
+	auto propertyType = this->m_properties[property].type;
 
-    if (propertyType != PropertyTypeFloat64)
-        return false;
+	if (propertyType != PropertyTypeFloat64)
+		return false;
 
-    *value = this->m_properties[property].num.float64;
+	*value = this->m_properties[property].num.float64;
 
-    return true;
+	return true;
 }
 
 bool ObjectProperties::getProperty(UInt32 property, std::string *value)
 {
-    if (!value || !this->m_properties.count(property))
-        return false;
+	if (!value || !this->m_properties.count(property))
+		return false;
 
-    auto propertyType = this->m_properties[property].type;
+	auto propertyType = this->m_properties[property].type;
 
-    if (propertyType != PropertyTypeString)
-        return false;
+	if (propertyType != PropertyTypeString)
+		return false;
 
-    *value = this->m_properties[property].str;
+	*value = this->m_properties[property].str;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::getProperty(UInt32 property,
-                                           FrameInfo *value)
+bool ObjectProperties::getProperty(UInt32 property, FrameInfo *value)
 {
-    if (!value || !this->m_properties.count(property))
-        return false;
+	if (!value || !this->m_properties.count(property))
+		return false;
 
-    auto propertyType = this->m_properties[property].type;
+	auto propertyType = this->m_properties[property].type;
 
-    if (propertyType != PropertyTypeVideoFormat)
-        return false;
+	if (propertyType != PropertyTypeVideoFormat)
+		return false;
 
-    *value = this->m_properties[property].videoFormat;
+	*value = this->m_properties[property].videoFormat;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::getProperty(UInt32 property,
-                                           UInt32 qualifierDataSize,
-                                           const void *qualifierData,
-                                           UInt32 dataSize,
-                                           UInt32 *dataUsed,
-                                           void *data)
+bool ObjectProperties::getProperty(UInt32 property, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, UInt32 *dataUsed, void *data)
 {
-    if (!this->m_properties.count(property))
-        return false;
+	if (!this->m_properties.count(property))
+		return false;
 
-    bool ok = true;
-    auto propertyType = this->m_properties[property].type;
+	bool ok = true;
+	auto propertyType = this->m_properties[property].type;
 
-    switch (propertyType) {
-        case PropertyTypeString:
-            if (dataUsed) {
-                *dataUsed = sizeof(CFStringRef);
+	switch (propertyType) {
+	case PropertyTypeString:
+		if (dataUsed) {
+			*dataUsed = sizeof(CFStringRef);
 
-                if (data)
-                    ok = dataSize == *dataUsed;
-            }
+			if (data)
+				ok = dataSize == *dataUsed;
+		}
 
-            if (ok && data) {
-                auto value = this->m_properties[property].str;
-                *static_cast<CFStringRef *>(data) =
-                        CFStringCreateWithCString(kCFAllocatorDefault,
-                                                  value.c_str(),
-                                                  kCFStringEncodingUTF8);
-            }
+		if (ok && data) {
+			auto value = this->m_properties[property].str;
+			*static_cast<CFStringRef *>(data) = CFStringCreateWithCString(kCFAllocatorDefault, value.c_str(), kCFStringEncodingUTF8);
+		}
 
-            break;
+		break;
 
-        case PropertyTypeWString:
-            if (dataUsed) {
-                *dataUsed = sizeof(CFStringRef);
+	case PropertyTypeWString:
+		if (dataUsed) {
+			*dataUsed = sizeof(CFStringRef);
 
-                if (data)
-                    ok = dataSize == *dataUsed;
-            }
+			if (data)
+				ok = dataSize == *dataUsed;
+		}
 
-            if (ok && data) {
-                auto value = this->m_properties[property].wstr;
-                *static_cast<CFStringRef *>(data) =
-                        CFStringCreateWithBytes(kCFAllocatorDefault,
-                                                reinterpret_cast<const UInt8 *>(value.c_str()),
-                                                CFIndex(value.size() * sizeof(wchar_t)),
-                                                kCFStringEncodingUTF32LE,
-                                                false);
-            }
+		if (ok && data) {
+			auto value = this->m_properties[property].wstr;
+			*static_cast<CFStringRef *>(data) = CFStringCreateWithBytes(kCFAllocatorDefault, reinterpret_cast<const UInt8 *>(value.c_str()),
+										    CFIndex(value.size() * sizeof(wchar_t)), kCFStringEncodingUTF32LE, false);
+		}
 
-            break;
+		break;
 
-        case PropertyTypeObjectVector: {
-            auto &objects = this->m_properties[property].objects;
-            auto objectList = static_cast<CMIOObjectID *>(data);
-            size_t i = 0;
+	case PropertyTypeObjectVector: {
+		auto &objects = this->m_properties[property].objects;
+		auto objectList = static_cast<CMIOObjectID *>(data);
+		size_t i = 0;
 
-            for (auto &object: objects) {
-                if (qualify(property,
-                            qualifierDataSize,
-                            qualifierData,
-                            object)) {
-                    if (data)
-                        objectList[i] = object->objectID();
+		for (auto &object : objects) {
+			if (qualify(property, qualifierDataSize, qualifierData, object)) {
+				if (data)
+					objectList[i] = object->objectID();
 
-                    i++;
-                }
-            }
+				i++;
+			}
+		}
 
-            if (dataUsed)
-                *dataUsed = UInt32(i * sizeof(CMIOObjectID));
+		if (dataUsed)
+			*dataUsed = UInt32(i * sizeof(CMIOObjectID));
 
-            break;
-        }
+		break;
+	}
 
-        case PropertyTypeObjectPtrVector: {
-            auto &objects = this->m_properties[property].objectsPtr;
-            auto objectList = static_cast<CMIOObjectID *>(data);
-            size_t i = 0;
+	case PropertyTypeObjectPtrVector: {
+		auto &objects = this->m_properties[property].objectsPtr;
+		auto objectList = static_cast<CMIOObjectID *>(data);
+		size_t i = 0;
 
-            for (auto &object: objects) {
-                if (qualify(property,
-                            qualifierDataSize,
-                            qualifierData,
-                            &object)) {
-                    if (data)
-                        objectList[i] = object->objectID();
+		for (auto &object : objects) {
+			if (qualify(property, qualifierDataSize, qualifierData, &object)) {
+				if (data)
+					objectList[i] = object->objectID();
 
-                    i++;
-                }
-            }
+				i++;
+			}
+		}
 
-            if (dataUsed)
-                *dataUsed = UInt32(i * sizeof(CMIOObjectID));
+		if (dataUsed)
+			*dataUsed = UInt32(i * sizeof(CMIOObjectID));
 
-            break;
-        }
+		break;
+	}
 
-        case PropertyTypeVideoFormat: {
-            if (dataUsed) {
-                *dataUsed = sizeof(CMFormatDescriptionRef);
-                ok = dataSize == *dataUsed;
-            }
+	case PropertyTypeVideoFormat: {
+		if (dataUsed) {
+			*dataUsed = sizeof(CMFormatDescriptionRef);
+			ok = dataSize == *dataUsed;
+		}
 
-            if (ok && data) {
-                auto videoFormat = this->m_properties[property].videoFormat;
-                auto status =
-                        CMVideoFormatDescriptionCreate(kCFAllocatorDefault,
-                                                       videoFormat.pix_format,
-                                                       videoFormat.width,
-                                                       videoFormat.height,
-                                                       nullptr,
-                                                       static_cast<CMFormatDescriptionRef *>(data));
+		if (ok && data) {
+			auto videoFormat = this->m_properties[property].videoFormat;
+			auto status = CMVideoFormatDescriptionCreate(kCFAllocatorDefault, videoFormat.pix_format, videoFormat.width, videoFormat.height, nullptr,
+								     static_cast<CMFormatDescriptionRef *>(data));
 
-                 if (status != noErr)
-                     ok = false;
-            }
+			if (status != noErr)
+				ok = false;
+		}
 
-            break;
-        }
+		break;
+	}
 
-        case PropertyTypeVideoFormatVector: {
-            if (dataUsed) {
-                *dataUsed = sizeof(CFArrayRef);
-                ok = dataSize == *dataUsed;
-            }
+	case PropertyTypeVideoFormatVector: {
+		if (dataUsed) {
+			*dataUsed = sizeof(CFArrayRef);
+			ok = dataSize == *dataUsed;
+		}
 
-            if (ok && data) {
-                auto videoFormats = this->m_properties[property].videoFormats;
-                std::vector<CMFormatDescriptionRef> formats;
+		if (ok && data) {
+			auto videoFormats = this->m_properties[property].videoFormats;
+			std::vector<CMFormatDescriptionRef> formats;
 
-                for (auto &format: videoFormats) {
-                    CMFormatDescriptionRef formatRef = nullptr;
-                    auto status =
-                            CMVideoFormatDescriptionCreate(kCFAllocatorDefault,
-                                                           format.pix_format,
-                                                           format.width,
-                                                           format.height,
-                                                           nullptr,
-                                                           &formatRef);
+			for (auto &format : videoFormats) {
+				CMFormatDescriptionRef formatRef = nullptr;
+				auto status = CMVideoFormatDescriptionCreate(kCFAllocatorDefault, format.pix_format, format.width, format.height, nullptr, &formatRef);
 
-                    if (status == noErr)
-                        formats.push_back(formatRef);
-                }
+				if (status == noErr)
+					formats.push_back(formatRef);
+			}
 
-                CFArrayRef array = nullptr;
+			CFArrayRef array = nullptr;
 
-                if (!formats.empty())
-                    array = CFArrayCreate(kCFAllocatorDefault,
-                                          reinterpret_cast<const void **>(formats.data()),
-                                          UInt32(formats.size()),
-                                          nullptr);
+			if (!formats.empty())
+				array = CFArrayCreate(kCFAllocatorDefault, reinterpret_cast<const void **>(formats.data()), UInt32(formats.size()), nullptr);
 
-                *static_cast<CFArrayRef *>(data) = array;
-            }
+			*static_cast<CFArrayRef *>(data) = array;
+		}
 
-            break;
-        }
+		break;
+	}
 
-        case PropertyTypeFloat64Vector: {
-            auto &values = this->m_properties[property].float64Vector;
-            auto valueList = static_cast<Float64 *>(data);
-            size_t i = 0;
+	case PropertyTypeFloat64Vector: {
+		auto &values = this->m_properties[property].float64Vector;
+		auto valueList = static_cast<Float64 *>(data);
+		size_t i = 0;
 
-            for (auto &value: values) {
-                if (qualify(property,
-                            qualifierDataSize,
-                            qualifierData,
-                            &value)) {
-                    if (data)
-                        valueList[i] = value;
+		for (auto &value : values) {
+			if (qualify(property, qualifierDataSize, qualifierData, &value)) {
+				if (data)
+					valueList[i] = value;
 
-                    i++;
-                }
-            }
+				i++;
+			}
+		}
 
-            if (dataUsed)
-                *dataUsed = UInt32(i * sizeof(Float64));
+		if (dataUsed)
+			*dataUsed = UInt32(i * sizeof(Float64));
 
-            break;
-        }
+		break;
+	}
 
-        case PropertyTypeAudioValueRangeVector: {
-            auto &values = this->m_properties[property].audioValueRangeVector;
-            auto valueList = static_cast<AudioValueRange *>(data);
-            size_t i = 0;
+	case PropertyTypeAudioValueRangeVector: {
+		auto &values = this->m_properties[property].audioValueRangeVector;
+		auto valueList = static_cast<AudioValueRange *>(data);
+		size_t i = 0;
 
-            for (auto &value: values) {
-                if (qualify(property,
-                            qualifierDataSize,
-                            qualifierData,
-                            &value)) {
-                    if (data)
-                        valueList[i] = value;
+		for (auto &value : values) {
+			if (qualify(property, qualifierDataSize, qualifierData, &value)) {
+				if (data)
+					valueList[i] = value;
 
-                    i++;
-                }
-            }
+				i++;
+			}
+		}
 
-            if (dataUsed)
-                *dataUsed = UInt32(i * sizeof(AudioValueRange));
+		if (dataUsed)
+			*dataUsed = UInt32(i * sizeof(AudioValueRange));
 
-            break;
-        }
+		break;
+	}
 
-        case PropertyTypeClock:
-            if (dataUsed) {
-                *dataUsed = sizeof(CFTypeRef);
-                ok = dataSize == *dataUsed;
-            }
+	case PropertyTypeClock:
+		if (dataUsed) {
+			*dataUsed = sizeof(CFTypeRef);
+			ok = dataSize == *dataUsed;
+		}
 
-            if (ok && data) {
-                auto value = this->m_properties[property].clock;
-                *static_cast<CFTypeRef *>(data) = value->ref();
-                CFRetain(value->ref());
-            }
+		if (ok && data) {
+			auto value = this->m_properties[property].clock;
+			*static_cast<CFTypeRef *>(data) = value->ref();
+			CFRetain(value->ref());
+		}
 
-            break;
+		break;
 
-        case PropertyTypeUInt32:
-            if (dataUsed) {
-                *dataUsed = sizeof(UInt32);
-                ok = dataSize == *dataUsed;
-            }
+	case PropertyTypeUInt32:
+		if (dataUsed) {
+			*dataUsed = sizeof(UInt32);
+			ok = dataSize == *dataUsed;
+		}
 
-            if (ok && data) {
-                auto value = this->m_properties[property].num.uint32;
-                *static_cast<UInt32 *>(data) = value;
-            }
+		if (ok && data) {
+			auto value = this->m_properties[property].num.uint32;
+			*static_cast<UInt32 *>(data) = value;
+		}
 
-            break;
+		break;
 
-        case PropertyTypeFloat64:
-            if (dataUsed) {
-                *dataUsed = sizeof(Float64);
-                ok = dataSize == *dataUsed;
-            }
+	case PropertyTypeFloat64:
+		if (dataUsed) {
+			*dataUsed = sizeof(Float64);
+			ok = dataSize == *dataUsed;
+		}
 
-            if (ok && data) {
-                auto value = this->m_properties[property].num.float64;
-                *static_cast<Float64 *>(data) = value;
-            }
+		if (ok && data) {
+			auto value = this->m_properties[property].num.float64;
+			*static_cast<Float64 *>(data) = value;
+		}
 
-            break;
+		break;
 
-        case PropertyTypePidT:
-            if (dataUsed) {
-                *dataUsed = sizeof(pid_t);
-                ok = dataSize == *dataUsed;
-            }
+	case PropertyTypePidT:
+		if (dataUsed) {
+			*dataUsed = sizeof(pid_t);
+			ok = dataSize == *dataUsed;
+		}
 
-            if (ok && data) {
-                auto value = this->m_properties[property].num.pidT;
-                *static_cast<pid_t *>(data) = value;
-            }
+		if (ok && data) {
+			auto value = this->m_properties[property].num.pidT;
+			*static_cast<pid_t *>(data) = value;
+		}
 
-            break;
+		break;
 
-        default:
-            return false;
-    }
+	default:
+		return false;
+	}
 
-    return ok;
+	return ok;
 }
 
 void ObjectProperties::removeProperty(UInt32 property)
 {
-    this->m_properties.erase(property);
+	this->m_properties.erase(property);
 }
 
 void ObjectProperties::update(const ObjectProperties &other)
 {
-    for (auto &property: other.m_properties)
-        this->m_properties[property.first] = property.second;
+	for (auto &property : other.m_properties)
+		this->m_properties[property.first] = property.second;
 }
 
 bool ObjectProperties::isSettable(UInt32 property)
 {
-    if (this->m_properties.count(property))
-        return this->m_properties[property].isSettable;
+	if (this->m_properties.count(property))
+		return this->m_properties[property].isSettable;
 
-    return true;
+	return true;
 }
 
-bool ObjectProperties::qualify(UInt32 property,
-                                       UInt32 qualifierDataSize,
-                                       const void *qualifierData,
-                                       const void *data)
+bool ObjectProperties::qualify(UInt32 property, UInt32 qualifierDataSize, const void *qualifierData, const void *data)
 {
-    if (qualifierDataSize && qualifierData && data)
-        switch (property) {
-            case kCMIOObjectPropertyOwnedObjects: {
-                auto object = static_cast<const Object *>(data);
-                auto qualifier = static_cast<const UInt32 *>(qualifierData);
+	if (qualifierDataSize && qualifierData && data)
+		switch (property) {
+		case kCMIOObjectPropertyOwnedObjects: {
+			auto object = static_cast<const Object *>(data);
+			auto qualifier = static_cast<const UInt32 *>(qualifierData);
 
-                for (UInt32 i = 0; i < qualifierDataSize; i++)
-                    if (qualifier[i] == object->classID())
-                        return true;
+			for (UInt32 i = 0; i < qualifierDataSize; i++)
+				if (qualifier[i] == object->classID())
+					return true;
 
-                return false;
-            }
+			return false;
+		}
 
-            case kCMIOStreamPropertyFrameRates:
-            case kCMIOStreamPropertyFrameRateRanges:
-                // Not implemented.
-                break;
+		case kCMIOStreamPropertyFrameRates:
+		case kCMIOStreamPropertyFrameRateRanges:
+			// Not implemented.
+			break;
 
-            default:
-                break;
-        }
+		default:
+			break;
+		}
 
-    return true;
+	return true;
 }

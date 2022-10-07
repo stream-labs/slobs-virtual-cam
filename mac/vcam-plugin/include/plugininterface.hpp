@@ -47,50 +47,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 struct PluginInterfacePrivate;
 
-class PluginInterface: public ObjectInterface
-{
-    public:
-        PluginInterface();
-        PluginInterface(const PluginInterface &other) = delete;
-        ~PluginInterface();
+class PluginInterface : public ObjectInterface {
+public:
+	PluginInterface();
+	PluginInterface(const PluginInterface &other) = delete;
+	~PluginInterface();
 
-        CMIOObjectID objectID() const;
-        static CMIOHardwarePlugInRef create();
-        Object *findObject(CMIOObjectID objectID);
+	CMIOObjectID objectID() const;
+	static CMIOHardwarePlugInRef create();
+	Object *findObject(CMIOObjectID objectID);
 
-        HRESULT QueryInterface(REFIID uuid, LPVOID *interface);
-        OSStatus Initialize();
-        OSStatus InitializeWithObjectID(CMIOObjectID objectID);
-        OSStatus Teardown();
+	HRESULT QueryInterface(REFIID uuid, LPVOID *interface);
+	OSStatus Initialize();
+	OSStatus InitializeWithObjectID(CMIOObjectID objectID);
+	OSStatus Teardown();
 
-    private:
-        PluginInterfacePrivate *d;
-        CMIOObjectID m_objectID;
-        std::vector<DevicePtr> m_devices;
+private:
+	PluginInterfacePrivate *d;
+	CMIOObjectID m_objectID;
+	std::vector<DevicePtr> m_devices;
 
-        static void deviceAdded(void *userData,
-                                const std::string &deviceId,
-                                    const std::string &name,
-                                    uint32_t width,
-                                    uint32_t height,
-                                    double fps);
-        static void deviceRemoved(void *userData,
-                                    const std::string &deviceId);
-        static void frameReady(void *userData,
-                                const std::string &deviceId,
-                                const uint8_t *data);
-        static void setMirror(void *userData,
-                                const std::string &deviceId,
-                                bool horizontalMirror,
-                                bool verticalMirror);
-        bool createDevice(const std::string &deviceId,
-                                    const std::string &name,
-                                    uint32_t width,
-                                    uint32_t height,
-                                    double fps);
-        void destroyDevice(const std::string &deviceId);
+	static void deviceAdded(void *userData, const std::string &deviceId, const std::string &name, uint32_t width, uint32_t height, double fps);
+	static void deviceRemoved(void *userData, const std::string &deviceId);
+	static void frameReady(void *userData, const std::string &deviceId, const uint8_t *data);
+	static void setMirror(void *userData, const std::string &deviceId, bool horizontalMirror, bool verticalMirror);
+	bool createDevice(const std::string &deviceId, const std::string &name, uint32_t width, uint32_t height, double fps);
+	void destroyDevice(const std::string &deviceId);
 
-    friend struct PluginInterfacePrivate;
+	friend struct PluginInterfacePrivate;
 };
 
 #endif

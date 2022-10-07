@@ -41,43 +41,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "clock.hpp"
 
-Clock::Clock(const std::string& name,
-                     const CMTime getTimeCallMinimumInterval,
-                     UInt32 numberOfEventsForRateSmoothing,
-                     UInt32 numberOfAveragesForRateSmoothing,
-                     void *parent):
-    m_parent(parent),
-    m_clock(nullptr)
+Clock::Clock(const std::string &name, const CMTime getTimeCallMinimumInterval, UInt32 numberOfEventsForRateSmoothing, UInt32 numberOfAveragesForRateSmoothing, void *parent)
+	: m_parent(parent), m_clock(nullptr)
 {
-    auto nameRef =
-            CFStringCreateWithCString(kCFAllocatorDefault,
-                                      name.c_str(),
-                                      kCFStringEncodingUTF8);
+	auto nameRef = CFStringCreateWithCString(kCFAllocatorDefault, name.c_str(), kCFStringEncodingUTF8);
 
-    auto status =
-            CMIOStreamClockCreate(kCFAllocatorDefault,
-                                  nameRef,
-                                  this->m_parent,
-                                  getTimeCallMinimumInterval,
-                                  numberOfEventsForRateSmoothing,
-                                  numberOfAveragesForRateSmoothing,
-                                  &this->m_clock);
+	auto status = CMIOStreamClockCreate(kCFAllocatorDefault, nameRef, this->m_parent, getTimeCallMinimumInterval, numberOfEventsForRateSmoothing,
+					    numberOfAveragesForRateSmoothing, &this->m_clock);
 
-    if (status != noErr)
-        this->m_clock = nullptr;
+	if (status != noErr)
+		this->m_clock = nullptr;
 
-    CFRelease(nameRef);
+	CFRelease(nameRef);
 }
 
 Clock::~Clock()
 {
-    if (this->m_clock) {
-        CMIOStreamClockInvalidate(this->m_clock);
-        CFRelease(this->m_clock);
-    }
+	if (this->m_clock) {
+		CMIOStreamClockInvalidate(this->m_clock);
+		CFRelease(this->m_clock);
+	}
 }
 
 CFTypeRef Clock::ref() const
 {
-    return this->m_clock;
+	return this->m_clock;
 }

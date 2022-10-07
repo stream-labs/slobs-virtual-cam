@@ -50,48 +50,45 @@ Assistant vcam_assistant;
 
 int main(int argc, char **argv)
 {
-    std::string fileName = "/tmp/" + vcam_assisant;
-    StartLogging(fileName, "log");
+	std::string fileName = "/tmp/" + vcam_assisant;
+	StartLogging(fileName, "log");
 
-    auto server =
-            xpc_connection_create_mach_service(vcam_agent.c_str(),
-                                               NULL,
-                                               XPC_CONNECTION_MACH_SERVICE_LISTENER);
+	auto server = xpc_connection_create_mach_service(vcam_agent.c_str(), NULL, XPC_CONNECTION_MACH_SERVICE_LISTENER);
 
-    if (!server)
-        return EXIT_FAILURE;
+	if (!server)
+		return EXIT_FAILURE;
 
-    for (int i = 0; i < argc; i++)
-        if (strcmp(argv[i], "--timeout") == 0 && i + 1 < argc) {
-            auto timeout = strtod(argv[i + 1], nullptr);
-            vcam_assistant.setTimeout(timeout);
+	for (int i = 0; i < argc; i++)
+		if (strcmp(argv[i], "--timeout") == 0 && i + 1 < argc) {
+			auto timeout = strtod(argv[i + 1], nullptr);
+			vcam_assistant.setTimeout(timeout);
 
-            break;
-        }
+			break;
+		}
 
-    xpc_connection_set_event_handler(server, ^(xpc_object_t event) {
-        auto type = xpc_get_type(event);
+	xpc_connection_set_event_handler(server, ^(xpc_object_t event) {
+		auto type = xpc_get_type(event);
 
-        if (type == XPC_TYPE_ERROR) {
-             auto description = xpc_copy_description(event);
-             free(description);
+		if (type == XPC_TYPE_ERROR) {
+			auto description = xpc_copy_description(event);
+			free(description);
 
-             return;
-        }
-        auto client = reinterpret_cast<xpc_connection_t>(event);
+			return;
+		}
+		auto client = reinterpret_cast<xpc_connection_t>(event);
 
-        xpc_connection_set_event_handler(client, ^(xpc_object_t event) {
-            vcam_assistant.messageReceived(client, event);
-        });
+		xpc_connection_set_event_handler(client, ^(xpc_object_t event) {
+			vcam_assistant.messageReceived(client, event);
+		});
 
-        xpc_connection_resume(client);
-    });
+		xpc_connection_resume(client);
+	});
 
-    xpc_connection_resume(server);
-    CFRunLoopRun();
-    xpc_release(server);
+	xpc_connection_resume(server);
+	CFRunLoopRun();
+	xpc_release(server);
 
-    StopLogging();
+	StopLogging();
 
-    return 0;
+	return 0;
 }

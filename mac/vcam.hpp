@@ -45,36 +45,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <vector>
 
-class VirtualCam
-{
-    private:
-        VCAM_IPC_Client ipc_client;
+class VirtualCam {
+private:
+	VCAM_IPC_Client ipc_client;
 
-    public:
-        std::string name     = "";
-        uint32_t width       = 0;
-        uint32_t height      = 0;
-        double   fps         = 0.0;
-	    uint32_t  surfaceID  = 0;
-	    std::string deviceID = "";
-    public:
-        VirtualCam();
-        ~VirtualCam();
+public:
+	std::string name = "";
+	uint32_t width = 0;
+	uint32_t height = 0;
+	double fps = 0.0;
+	uint32_t surfaceID = 0;
+	std::string deviceID = "";
 
-        bool uploadFrame(const uint8_t *frame);
+public:
+	VirtualCam();
+	~VirtualCam();
 
-        bool     createWebcam(const std::string name,
-                              int width,
-                              int height,
-                              double fps);
-        uint32_t createSharedMemory();
-        bool     removeWebcam();
-        bool     removeAllWebcams();
+	bool uploadFrame(const uint8_t *frame);
 
-        bool     startDaemon();
-        bool     removeDaemon();
+	bool createWebcam(const std::string name, int width, int height, double fps);
+	uint32_t createSharedMemory();
+	bool removeWebcam();
+	bool removeAllWebcams();
 
-        void setHorizontalMirroring(bool state);
+	bool startDaemon();
+	bool removeDaemon();
+
+	void setHorizontalMirroring(bool state);
 };
 
 #endif

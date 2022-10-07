@@ -47,35 +47,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class Object;
 typedef std::shared_ptr<Object> ObjectPtr;
 
-class Object: public ObjectInterface
-{
-    public:
-        Object(CMIOHardwarePlugInRef m_pluginInterface,
-                Object *m_parent=nullptr);
-        Object(Object *m_parent=nullptr);
-        virtual ~Object();
+class Object : public ObjectInterface {
+public:
+	Object(CMIOHardwarePlugInRef m_pluginInterface, Object *m_parent = nullptr);
+	Object(Object *m_parent = nullptr);
+	virtual ~Object();
 
-        CMIOObjectID objectID() const;
-        UInt32 classID() const;
-        virtual OSStatus createObject();
-        virtual OSStatus registerObject(bool regist);
-        Object *findObject(CMIOObjectID objectID);
-        OSStatus propertyChanged(UInt32 numberAddresses,
-                                    const CMIOObjectPropertyAddress *addresses);
+	CMIOObjectID objectID() const;
+	UInt32 classID() const;
+	virtual OSStatus createObject();
+	virtual OSStatus registerObject(bool regist);
+	Object *findObject(CMIOObjectID objectID);
+	OSStatus propertyChanged(UInt32 numberAddresses, const CMIOObjectPropertyAddress *addresses);
 
-        OSStatus setPropertyData(const CMIOObjectPropertyAddress *address,
-                                    UInt32 qualifierDataSize,
-                                    const void *qualifierData,
-                                    UInt32 dataSize,
-                                    const void *data);
+	OSStatus setPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, const void *data);
 
-    private:
-        void childsUpdate();
+private:
+	void childsUpdate();
 
-    protected:
-        CMIOHardwarePlugInRef m_pluginInterface;
-        Object *m_parent;
-        std::list<Object *> m_childs;
-        bool m_isCreated;
+protected:
+	CMIOHardwarePlugInRef m_pluginInterface;
+	Object *m_parent;
+	std::list<Object *> m_childs;
+	bool m_isCreated;
 };
 #endif

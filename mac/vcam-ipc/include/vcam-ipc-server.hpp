@@ -42,31 +42,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "vcam-ipc.hpp"
 
-class VCAM_IPC_Server: public VCAM_IPC {
+class VCAM_IPC_Server : public VCAM_IPC {
 public:
-    SIGNAL(FrameReady,
-                    const std::string &deviceId,
-                    const uint8_t *data)
-    SIGNAL(DeviceAdded,
-                    const std::string &deviceId,
-                    const std::string &name,
-                    uint32_t width,
-                    uint32_t height,
-                    double fps)
-    SIGNAL(DeviceRemoved,
-                    const std::string &deviceId)
-    SIGNAL(MirrorChanged,
-                    const std::string &deviceId,
-                    bool horizontalMirror,
-                    bool verticalMirror)
+	SIGNAL(FrameReady, const std::string &deviceId, const uint8_t *data)
+	SIGNAL(DeviceAdded, const std::string &deviceId, const std::string &name, uint32_t width, uint32_t height, double fps)
+	SIGNAL(DeviceRemoved, const std::string &deviceId)
+	SIGNAL(MirrorChanged, const std::string &deviceId, bool horizontalMirror, bool verticalMirror)
 public:
-    VCAM_IPC_Server();
-    ~VCAM_IPC_Server();
+	VCAM_IPC_Server();
+	~VCAM_IPC_Server();
 
-    void deviceCreate(xpc_connection_t client, xpc_object_t event);
-    void deviceDestroy(xpc_connection_t client, xpc_object_t event);
-    void frameReady(xpc_connection_t client, xpc_object_t event);
-    void setMirror(xpc_connection_t client, xpc_object_t event);
+	void deviceCreate(xpc_connection_t client, xpc_object_t event);
+	void deviceDestroy(xpc_connection_t client, xpc_object_t event);
+	void frameReady(xpc_connection_t client, xpc_object_t event);
+	void setMirror(xpc_connection_t client, xpc_object_t event);
 };
 
 #endif

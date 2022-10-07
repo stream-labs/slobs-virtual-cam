@@ -41,14 +41,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "util.h"
 #include "logger.h"
 
-extern "C" void *vcam_plugin_main(CFAllocatorRef allocator,
-                              CFUUIDRef requestedTypeUUID)
+extern "C" void *vcam_plugin_main(CFAllocatorRef allocator, CFUUIDRef requestedTypeUUID)
 {
-    std::string fileName = "/tmp/" + vcam_plugin;
-    StartLogging(fileName, "log");
+	std::string fileName = "/tmp/" + vcam_plugin;
+	StartLogging(fileName, "log");
 
-    if (!CFEqual(requestedTypeUUID, kCMIOHardwarePlugInTypeID))
-        return nullptr;
+	if (!CFEqual(requestedTypeUUID, kCMIOHardwarePlugInTypeID))
+		return nullptr;
 
-    return PluginInterface::create();
+	return PluginInterface::create();
 }
