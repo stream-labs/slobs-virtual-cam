@@ -45,116 +45,104 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "logger.h"
 
+class LoggerPrivate : public std::streambuf {
+public:
+	std::ostream *outs;
+	std::string fileName;
+	std::fstream logFile;
+	Logger::LogCallback logCallback;
 
-class LoggerPrivate: public std::streambuf
-{
-    public:
-        std::ostream *outs;
-        std::string fileName;
-        std::fstream logFile;
-        Logger::LogCallback logCallback;
+	LoggerPrivate();
+	~LoggerPrivate() override;
 
-        LoggerPrivate();
-        ~LoggerPrivate() override;
-
-    protected:
-        std::streamsize xsputn(const char *s, std::streamsize n) override;
+protected:
+	std::streamsize xsputn(const char *s, std::streamsize n) override;
 };
 
 inline LoggerPrivate *loggerPrivate()
 {
-    static LoggerPrivate logger;
+	static LoggerPrivate logger;
 
-    return &logger;
+	return &logger;
 }
 
-void Logger::start(const std::string &fileName,
-                           const std::string &extension)
+void Logger::start(const std::string &fileName, const std::string &extension)
 {
-    stop();
-    char ts[256];
-    auto time = std::time(nullptr);
-    strftime(ts, 256, "%Y%m%d%H%M%S", std::localtime(&time));
-    std::string timestamp = ts;
-    loggerPrivate()->fileName =
-            fileName + "-" + timestamp + "." + extension;
+	stop();
+	char ts[256];
+	auto time = std::time(nullptr);
+	strftime(ts, 256, "%Y%m%d%H%M%S", std::localtime(&time));
+	std::string timestamp = ts;
+	loggerPrivate()->fileName = fileName + "-" + timestamp + "." + extension;
 }
 
 void Logger::start(LogCallback callback)
 {
-    stop();
-    loggerPrivate()->logCallback = callback;
+	stop();
+	loggerPrivate()->logCallback = callback;
 }
 
 std::string Logger::header()
 {
-    auto now = std::chrono::system_clock::now();
-    auto nowMSecs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
-    char timeStamp[256];
-    auto time = std::chrono::system_clock::to_time_t(now);
-    strftime(timeStamp, 256, "%Y-%m-%d %H:%M:%S", std::localtime(&time));
-    std::stringstream ss;
-    ss << "["
-       << timeStamp
-       << "." << nowMSecs.count() % 1000 << ", " << std::this_thread::get_id() << "] ";
+	auto now = std::chrono::system_clock::now();
+	auto nowMSecs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+	char timeStamp[256];
+	auto time = std::chrono::system_clock::to_time_t(now);
+	strftime(timeStamp, 256, "%Y-%m-%d %H:%M:%S", std::localtime(&time));
+	std::stringstream ss;
+	ss << "[" << timeStamp << "." << nowMSecs.count() % 1000 << ", " << std::this_thread::get_id() << "] ";
 
-    return ss.str();
+	return ss.str();
 }
 
 std::ostream &Logger::out()
 {
-    if (loggerPrivate()->logCallback.second)
-        return *loggerPrivate()->outs;
+	if (loggerPrivate()->logCallback.second)
+		return *loggerPrivate()->outs;
 
-    if (loggerPrivate()->fileName.empty())
-        return std::cout;
+	if (loggerPrivate()->fileName.empty())
+		return std::cout;
 
-    if (!loggerPrivate()->logFile.is_open())
-        loggerPrivate()->logFile.open(loggerPrivate()->fileName,
-                                             std::ios_base::out
-                                             | std::ios_base::app);
+	if (!loggerPrivate()->logFile.is_open())
+		loggerPrivate()->logFile.open(loggerPrivate()->fileName, std::ios_base::out | std::ios_base::app);
 
-    if (!loggerPrivate()->logFile.is_open())
-        return std::cout;
+	if (!loggerPrivate()->logFile.is_open())
+		return std::cout;
 
-    return loggerPrivate()->logFile;
+	return loggerPrivate()->logFile;
 }
 
 void Logger::log()
 {
-    tlog(header());
+	tlog(header());
 }
 
 void Logger::tlog()
 {
-    out() << std::endl;
+	out() << std::endl;
 }
 
 void Logger::stop()
 {
-    loggerPrivate()->fileName = {};
+	loggerPrivate()->fileName = {};
 
-    if (loggerPrivate()->logFile.is_open())
-        loggerPrivate()->logFile.close();
+	if (loggerPrivate()->logFile.is_open())
+		loggerPrivate()->logFile.close();
 
-    loggerPrivate()->logCallback = {nullptr, nullptr};
+	loggerPrivate()->logCallback = {nullptr, nullptr};
 }
 
-LoggerPrivate::LoggerPrivate():
-    outs(new std::ostream(this)),
-    logCallback({nullptr, nullptr})
-{
-}
+LoggerPrivate::LoggerPrivate() : outs(new std::ostream(this)), logCallback({nullptr, nullptr}) {}
 
 LoggerPrivate::~LoggerPrivate()
 {
-    delete this->outs;
+	delete this->outs;
 }
 
 std::streamsize LoggerPrivate::xsputn(const char *s, std::streamsize n)
 {
-    if (this->logCallback.second)
-        this->logCallback.second(this->logCallback.first, s, size_t(n));
+	if (this->logCallback.second)
+		this->logCallback.second(this->logCallback.first, s, size_t(n));
 
-    return std::streambuf::xsputn(s, n);
+	return std::streambuf::xsputn(s, n);
 }

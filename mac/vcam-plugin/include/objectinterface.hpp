@@ -45,47 +45,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "objectproperties.hpp"
 
-#define PrintFunction() \
-    Print("VCAM-PLUGIN::", __FUNCTION__, "()")
+#define PrintFunction() Print("VCAM-PLUGIN::", __FUNCTION__, "()")
 
-class ObjectInterface
-{
-    public:
-        ObjectInterface();
-        virtual ~ObjectInterface();
+class ObjectInterface {
+public:
+	ObjectInterface();
+	virtual ~ObjectInterface();
 
-        ObjectProperties properties() const;
-        ObjectProperties &properties();
-        void setProperties(const ObjectProperties &properties);
-        void updateProperties(const ObjectProperties &properties);
-        static CMIOObjectPropertyAddress address(CMIOObjectPropertySelector selector=0,
-                                                    CMIOObjectPropertyScope scope=kCMIOObjectPropertyScopeGlobal,
-                                                    CMIOObjectPropertyElement element=kCMIOObjectPropertyElementMaster);
+	ObjectProperties properties() const;
+	ObjectProperties &properties();
+	void setProperties(const ObjectProperties &properties);
+	void updateProperties(const ObjectProperties &properties);
+	static CMIOObjectPropertyAddress address(CMIOObjectPropertySelector selector = 0, CMIOObjectPropertyScope scope = kCMIOObjectPropertyScopeGlobal,
+						 CMIOObjectPropertyElement element = kCMIOObjectPropertyElementMaster);
 
-        virtual void show();
-        virtual Boolean hasProperty(const CMIOObjectPropertyAddress *address);
-        virtual OSStatus isPropertySettable(const CMIOObjectPropertyAddress *address,
-                                            Boolean *isSettable);
-        virtual OSStatus getPropertyDataSize(const CMIOObjectPropertyAddress *address,
-                                                UInt32 qualifierDataSize,
-                                                const void *qualifierData,
-                                                UInt32 *dataSize);
-        virtual OSStatus getPropertyData(const CMIOObjectPropertyAddress *address,
-                                            UInt32 qualifierDataSize,
-                                            const void *qualifierData,
-                                            UInt32 dataSize,
-                                            UInt32 *dataUsed,
-                                            void *data);
-        virtual OSStatus setPropertyData(const CMIOObjectPropertyAddress *address,
-                                            UInt32 qualifierDataSize,
-                                            const void *qualifierData,
-                                            UInt32 dataSize,
-                                            const void *data);
+	virtual void show();
+	virtual Boolean hasProperty(const CMIOObjectPropertyAddress *address);
+	virtual OSStatus isPropertySettable(const CMIOObjectPropertyAddress *address, Boolean *isSettable);
+	virtual OSStatus getPropertyDataSize(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 *dataSize);
+	virtual OSStatus getPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, UInt32 *dataUsed,
+					 void *data);
+	virtual OSStatus setPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, const void *data);
 
-    protected:
-        CMIOObjectID m_objectID;
-        std::string m_className;
-        UInt32 m_classID;
-        ObjectProperties m_properties;
+protected:
+	CMIOObjectID m_objectID;
+	std::string m_className;
+	UInt32 m_classID;
+	ObjectProperties m_properties;
 };
 #endif

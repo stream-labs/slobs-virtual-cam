@@ -41,130 +41,97 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "logger.h"
 #include "util.h"
 
-ObjectInterface::ObjectInterface():
-    m_objectID(0),
-    m_classID(0)
-{
+ObjectInterface::ObjectInterface() : m_objectID(0), m_classID(0) {}
 
-}
-
-ObjectInterface::~ObjectInterface()
-{
-
-}
+ObjectInterface::~ObjectInterface() {}
 
 ObjectProperties ObjectInterface::properties() const
 {
-    return this->m_properties;
+	return this->m_properties;
 }
 
 ObjectProperties &ObjectInterface::properties()
 {
-    return this->m_properties;
+	return this->m_properties;
 }
 
 void ObjectInterface::setProperties(const ObjectProperties &properties)
 {
-    this->m_properties = properties;
+	this->m_properties = properties;
 }
 
 void ObjectInterface::updateProperties(const ObjectProperties &properties)
 {
-    this->m_properties.update(properties);
+	this->m_properties.update(properties);
 }
 
-CMIOObjectPropertyAddress ObjectInterface::address(CMIOObjectPropertySelector selector,
-                                                           CMIOObjectPropertyScope scope,
-                                                           CMIOObjectPropertyElement element)
+CMIOObjectPropertyAddress ObjectInterface::address(CMIOObjectPropertySelector selector, CMIOObjectPropertyScope scope, CMIOObjectPropertyElement element)
 {
-    return CMIOObjectPropertyAddress {selector, scope, element};
+	return CMIOObjectPropertyAddress{selector, scope, element};
 }
 
 void ObjectInterface::show()
 {
-    PrintFunction();
+	PrintFunction();
 }
 
 Boolean ObjectInterface::hasProperty(const CMIOObjectPropertyAddress *address)
 {
-    PrintFunction();
+	PrintFunction();
 
-    if (!this->m_properties.getProperty(address->mSelector)) {
-        return false;
-    }
+	if (!this->m_properties.getProperty(address->mSelector)) {
+		return false;
+	}
 
-    return true;
+	return true;
 }
 
-OSStatus ObjectInterface::isPropertySettable(const CMIOObjectPropertyAddress *address,
-                                                     Boolean *isSettable)
+OSStatus ObjectInterface::isPropertySettable(const CMIOObjectPropertyAddress *address, Boolean *isSettable)
 {
-    PrintFunction();
+	PrintFunction();
 
-    if (!this->m_properties.getProperty(address->mSelector)) {
-        return kCMIOHardwareUnknownPropertyError;
-    }
+	if (!this->m_properties.getProperty(address->mSelector)) {
+		return kCMIOHardwareUnknownPropertyError;
+	}
 
-    bool settable = this->m_properties.isSettable(address->mSelector);
+	bool settable = this->m_properties.isSettable(address->mSelector);
 
-    if (isSettable)
-        *isSettable = settable;
+	if (isSettable)
+		*isSettable = settable;
 
-    return kCMIOHardwareNoError;
+	return kCMIOHardwareNoError;
 }
 
-OSStatus ObjectInterface::getPropertyDataSize(const CMIOObjectPropertyAddress *address,
-                                                      UInt32 qualifierDataSize,
-                                                      const void *qualifierData,
-                                                      UInt32 *dataSize)
+OSStatus ObjectInterface::getPropertyDataSize(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 *dataSize)
 {
-    PrintFunction();
+	PrintFunction();
 
-    if (!this->m_properties.getProperty(address->mSelector,
-                                        qualifierDataSize,
-                                        qualifierData,
-                                        0,
-                                        dataSize)) {
-        return kCMIOHardwareUnknownPropertyError;
-    }
+	if (!this->m_properties.getProperty(address->mSelector, qualifierDataSize, qualifierData, 0, dataSize)) {
+		return kCMIOHardwareUnknownPropertyError;
+	}
 
-    return kCMIOHardwareNoError;
+	return kCMIOHardwareNoError;
 }
 
-OSStatus ObjectInterface::getPropertyData(const CMIOObjectPropertyAddress *address,
-                                                  UInt32 qualifierDataSize,
-                                                  const void *qualifierData,
-                                                  UInt32 dataSize,
-                                                  UInt32 *dataUsed,
-                                                  void *data)
+OSStatus ObjectInterface::getPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, UInt32 *dataUsed,
+					  void *data)
 {
-    PrintFunction();
+	PrintFunction();
 
-    if (!this->m_properties.getProperty(address->mSelector,
-                                        qualifierDataSize,
-                                        qualifierData,
-                                        dataSize,
-                                        dataUsed,
-                                        data)) {
-        return kCMIOHardwareUnknownPropertyError;
-    }
+	if (!this->m_properties.getProperty(address->mSelector, qualifierDataSize, qualifierData, dataSize, dataUsed, data)) {
+		return kCMIOHardwareUnknownPropertyError;
+	}
 
-    return kCMIOHardwareNoError;
+	return kCMIOHardwareNoError;
 }
 
-OSStatus ObjectInterface::setPropertyData(const CMIOObjectPropertyAddress *address,
-                                                  UInt32 qualifierDataSize,
-                                                  const void *qualifierData,
-                                                  UInt32 dataSize,
-                                                  const void *data)
+OSStatus ObjectInterface::setPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, const void *data)
 {
-    PrintFunction();
+	PrintFunction();
 
-    if (!this->m_properties.setProperty(address->mSelector,
-                                        dataSize,
-                                        data)) {
-        return kCMIOHardwareUnknownPropertyError;
-    }
+	if (!this->m_properties.setProperty(address->mSelector, dataSize, data)) {
+		return kCMIOHardwareUnknownPropertyError;
+	}
 
-    return kCMIOHardwareNoError;
+	return kCMIOHardwareNoError;
 }

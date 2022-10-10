@@ -45,52 +45,49 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class Stream;
 typedef std::shared_ptr<Stream> StreamPtr;
 
-class Stream: public Object
-{
-    public:
-        Stream(bool registerObject=false, Object *m_parent=nullptr);
-        Stream(const Stream &other) = delete;
-        ~Stream();
+class Stream : public Object {
+public:
+	Stream(bool registerObject = false, Object *m_parent = nullptr);
+	Stream(const Stream &other) = delete;
+	~Stream();
 
-        OSStatus createObject();
-        OSStatus registerObject(bool regist=true);
-        void setFrameInfo(const FrameInfo &fi);
-        void setFPS(const double &fps);
-        bool start();
-        void stop();
-        bool running();
+	OSStatus createObject();
+	OSStatus registerObject(bool regist = true);
+	void setFrameInfo(const FrameInfo &fi);
+	void setFPS(const double &fps);
+	bool start();
+	void stop();
+	bool running();
 
-        void frameReady(const uint8_t *data);
-        void setMirror(bool horizontalMirror, bool verticalMirror);
+	void frameReady(const uint8_t *data);
+	void setMirror(bool horizontalMirror, bool verticalMirror);
 
-        // Stream Interface
-        OSStatus copyBufferQueue(CMIODeviceStreamQueueAlteredProc queueAlteredProc,
-                                    void *queueAlteredRefCon,
-                                    CMSimpleQueueRef *queue);
-        OSStatus deckPlay();
-        OSStatus deckStop();
-        OSStatus deckJog(SInt32 speed);
-        OSStatus deckCueTo(Float64 frameNumber, Boolean playOnCue);
+	// Stream Interface
+	OSStatus copyBufferQueue(CMIODeviceStreamQueueAlteredProc queueAlteredProc, void *queueAlteredRefCon, CMSimpleQueueRef *queue);
+	OSStatus deckPlay();
+	OSStatus deckStop();
+	OSStatus deckJog(SInt32 speed);
+	OSStatus deckCueTo(Float64 frameNumber, Boolean playOnCue);
 
-    private:
-        ClockPtr m_clock;
-        UInt64 m_sequence;
-        CMTime m_pts;
-        CMSimpleQueueRef m_queue;
-        CMIODeviceStreamQueueAlteredProc m_queueAltered {nullptr};
-        const uint8_t * m_currentData;
-        void *m_queueAlteredRefCon {nullptr};
-        CFRunLoopTimerRef m_timer {nullptr};
-        std::mutex m_mutex;
-        bool m_running {false};
-        bool m_horizontalMirror {false};
-        bool m_verticalMirror {false};
-        std::thread *timer;
-        bool stop_timer;
+private:
+	ClockPtr m_clock;
+	UInt64 m_sequence;
+	CMTime m_pts;
+	CMSimpleQueueRef m_queue;
+	CMIODeviceStreamQueueAlteredProc m_queueAltered{nullptr};
+	const uint8_t *m_currentData;
+	void *m_queueAlteredRefCon{nullptr};
+	CFRunLoopTimerRef m_timer{nullptr};
+	std::mutex m_mutex;
+	bool m_running{false};
+	bool m_horizontalMirror{false};
+	bool m_verticalMirror{false};
+	std::thread *timer;
+	bool stop_timer;
 
-        void renderFrames();
-        bool startTimer();
-        void stopTimer();
-        static void streamLoop(CFRunLoopTimerRef timer, void *info);
-        void sendFrame(const uint8_t *data);
+	void renderFrames();
+	bool startTimer();
+	void stopTimer();
+	static void streamLoop(CFRunLoopTimerRef timer, void *info);
+	void sendFrame(const uint8_t *data);
 };

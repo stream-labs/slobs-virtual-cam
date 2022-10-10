@@ -45,29 +45,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 bool uuidEqual(const REFIID &uuid1, const CFUUIDRef uuid2)
 {
-    auto iid2 = CFUUIDGetUUIDBytes(uuid2);
-    auto puuid1 = reinterpret_cast<const UInt8 *>(&uuid1);
-    auto puuid2 = reinterpret_cast<const UInt8 *>(&iid2);
+	auto iid2 = CFUUIDGetUUIDBytes(uuid2);
+	auto puuid1 = reinterpret_cast<const UInt8 *>(&uuid1);
+	auto puuid2 = reinterpret_cast<const UInt8 *>(&iid2);
 
-    for (int i = 0; i < 16; i++)
-        if (puuid1[i] != puuid2[i])
-            return false;
+	for (int i = 0; i < 16; i++)
+		if (puuid1[i] != puuid2[i])
+			return false;
 
-    return true;
+	return true;
 }
 
 std::string enumToString(UInt32 value)
 {
-    auto valueChr = reinterpret_cast<char *>(&value);
-    std::stringstream ss;
+	auto valueChr = reinterpret_cast<char *>(&value);
+	std::stringstream ss;
 
-    for (int i = 3; i >= 0; i--)
-        if (valueChr[i] < 0)
-            ss << std::hex << valueChr[i];
-        else if (valueChr[i] < 32)
-            ss << int(valueChr[i]);
-        else
-            ss << valueChr[i];
+	for (int i = 3; i >= 0; i--)
+		if (valueChr[i] < 0)
+			ss << std::hex << valueChr[i];
+		else if (valueChr[i] < 32)
+			ss << int(valueChr[i]);
+		else
+			ss << valueChr[i];
 
-    return "'" + ss.str() + "'";
+	return "'" + ss.str() + "'";
 }

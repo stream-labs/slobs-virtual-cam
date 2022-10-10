@@ -42,24 +42,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "vcam-ipc.hpp"
 
-class VCAM_IPC_Client: public VCAM_IPC {
+class VCAM_IPC_Client : public VCAM_IPC {
 public:
-    VCAM_IPC_Client();
-    ~VCAM_IPC_Client();
+	VCAM_IPC_Client();
+	~VCAM_IPC_Client();
 
-    std::string deviceCreate(std::string name, uint32_t width, uint32_t height, double fps);
-    bool deviceDestroy(const std::string &deviceId);
-    bool destroyAllDevices();
-    bool deviceUploadFrame(const std::string deviceID,
-                            uint32_t surfaceID,
-                            const uint8_t *frame,
-                            uint32_t size);
-    void setMirroring(const std::string &deviceId,
-                        bool horizontalMirrored,
-                        bool verticalMirrored);
+	std::string deviceCreate(std::string name, uint32_t width, uint32_t height, double fps);
+	bool deviceDestroy(const std::string &deviceId);
+	bool destroyAllDevices();
+	bool deviceUploadFrame(const std::string deviceID, uint32_t surfaceID, const uint8_t *frame, uint32_t size);
+	void setMirroring(const std::string &deviceId, bool horizontalMirrored, bool verticalMirrored);
 
-    bool startDaemon();
-    void removeDaemon();
+	bool startDaemon();
+	void removeDaemon();
 };
 
 #endif

@@ -52,54 +52,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "vcam-ipc-constants.h"
 #include "signal.h"
 
-#define PrintFunction() \
-    Print("VCAM-IPC::", __FUNCTION__, "()")
+#define PrintFunction() Print("VCAM-IPC::", __FUNCTION__, "()")
 
-typedef std::function<void (xpc_connection_t, xpc_object_t)> Function;
+typedef std::function<void(xpc_connection_t, xpc_object_t)> Function;
 
 class VCAM_IPC {
 protected:
-    bool client;
-    std::string m_portName;
-    xpc_connection_t m_messagePort;
-    xpc_connection_t m_serverMessagePort;
+	bool client;
+	std::string m_portName;
+	xpc_connection_t m_messagePort;
+	xpc_connection_t m_serverMessagePort;
 
 private:
-    std::map<VCAM_IPC_EVENT, Function> functions;
+	std::map<VCAM_IPC_EVENT, Function> functions;
 
 public:
-    VCAM_IPC();
-    ~VCAM_IPC();
+	VCAM_IPC();
+	~VCAM_IPC();
 
-    void connect(bool client);
-    void disconnect();
-    bool registerPeer(bool client);
-    void unregisterPeer();
-    void messageReceived(xpc_connection_t client, xpc_object_t event);
+	void connect(bool client);
+	void disconnect();
+	bool registerPeer(bool client);
+	void unregisterPeer();
+	void messageReceived(xpc_connection_t client, xpc_object_t event);
 
-    // Common
-    DeviceInfo *getDevice();
-    bool isHorizontalMirrored(const std::string &deviceId);
-    bool isVerticalMirrored(const std::string &deviceId);
+	// Common
+	DeviceInfo *getDevice();
+	bool isHorizontalMirrored(const std::string &deviceId);
+	bool isVerticalMirrored(const std::string &deviceId);
 
-    void registerFunction(VCAM_IPC_EVENT event, Function func) {
-        functions.emplace(std::make_pair(event, func)); 
-    };
+	void registerFunction(VCAM_IPC_EVENT event, Function func) { functions.emplace(std::make_pair(event, func)); };
 
-    void unregisterFunction(VCAM_IPC_EVENT event) {
-        functions.erase(event);
-    }
+	void unregisterFunction(VCAM_IPC_EVENT event) { functions.erase(event); }
 
-    // Utility methods
-    std::string replace(std::string& str,
-        const std::string& from, const std::string& to) const;
-    std::string homePath() const;
-    bool fileExists(const std::wstring &path) const;
-    bool fileExists(const std::string &path) const;
-    std::wstring fileName(const std::wstring &path) const;
-    bool mkpath(const std::string &path) const;
-    bool loadDaemon();
-    void unloadDaemon() const;
+	// Utility methods
+	std::string replace(std::string &str, const std::string &from, const std::string &to) const;
+	std::string homePath() const;
+	bool fileExists(const std::wstring &path) const;
+	bool fileExists(const std::string &path) const;
+	std::wstring fileName(const std::wstring &path) const;
+	bool mkpath(const std::string &path) const;
+	bool loadDaemon();
+	void unloadDaemon() const;
 };
 
 #endif

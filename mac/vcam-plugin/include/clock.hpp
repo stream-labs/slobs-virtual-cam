@@ -47,20 +47,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class Clock;
 typedef std::shared_ptr<Clock> ClockPtr;
 
-class Clock
-{
-    public:
-        Clock(const std::string& name,
-                const CMTime getTimeCallMinimumInterval,
-                UInt32 numberOfEventsForRateSmoothing,
-                UInt32 numberOfAveragesForRateSmoothing,
-                void *parent=nullptr);
-        ~Clock();
+class Clock {
+public:
+	Clock(const std::string &name, const CMTime getTimeCallMinimumInterval, UInt32 numberOfEventsForRateSmoothing, UInt32 numberOfAveragesForRateSmoothing,
+	      void *parent = nullptr);
+	~Clock();
 
-        CFTypeRef ref() const;
+	CFTypeRef ref() const;
 
-    private:
-        void *m_parent;
-        CFTypeRef m_clock;
+private:
+	void *m_parent;
+	CFTypeRef m_clock;
 };
 #endif
