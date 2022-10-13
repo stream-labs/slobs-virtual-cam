@@ -42,379 +42,363 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <Foundation/Foundation.h>
 #include <fstream>
 
-VCAM_IPC::VCAM_IPC() {
-    m_messagePort = nullptr;
-    m_serverMessagePort = nullptr;
-    client = false;
+VCAM_IPC::VCAM_IPC()
+{
+	m_messagePort = nullptr;
+	m_serverMessagePort = nullptr;
+	client = false;
 }
 
-VCAM_IPC::~VCAM_IPC() {
-    this->unregisterPeer();
+VCAM_IPC::~VCAM_IPC()
+{
+	this->unregisterPeer();
 }
 
-void VCAM_IPC::connect(bool client) {
-    this->client = client;
-    this->registerPeer(client);
+void VCAM_IPC::connect(bool client)
+{
+	this->client = client;
+	this->registerPeer(client);
 }
 
-void VCAM_IPC::disconnect() {
-    this->unregisterPeer();
-    this->client = false;
+void VCAM_IPC::disconnect()
+{
+	this->unregisterPeer();
+	this->client = false;
 }
 
-std::string VCAM_IPC::replace(std::string& str,
-    const std::string& from, const std::string& to) const {
-    size_t start_pos = str.find(from);
-    if (start_pos == std::string::npos)
-        return "";
-    str.replace(start_pos, from.length(), to);
-    return str;
+std::string VCAM_IPC::replace(std::string &str, const std::string &from, const std::string &to) const
+{
+	size_t start_pos = str.find(from);
+	if (start_pos == std::string::npos)
+		return "";
+	str.replace(start_pos, from.length(), to);
+	return str;
 }
 
-bool VCAM_IPC::registerPeer(bool client) {\
-    if (!client) {
-        std::string plistFile =
-                vcam_agent_path + "/" + vcam_agent + ".plist";
+bool VCAM_IPC::registerPeer(bool client)
+{
+	if (!client) {
+		std::string plistFile = vcam_agent_path + "/" + vcam_agent + ".plist";
 
-        if (!this->fileExists(plistFile)) {
-            return false;
-        }
-    }
+		if (!this->fileExists(plistFile)) {
+			return false;
+		}
+	}
 
-    if (this->m_serverMessagePort)
-        return true;
+	if (this->m_serverMessagePort)
+		return true;
 
-    xpc_object_t dictionary = nullptr;
-    xpc_object_t reply = nullptr;
-    xpc_connection_t messagePort = nullptr;
-    xpc_type_t replyType;
-    bool status = false;
+	xpc_object_t dictionary = nullptr;
+	xpc_object_t reply = nullptr;
+	xpc_connection_t messagePort = nullptr;
+	xpc_type_t replyType;
+	bool status = false;
 
-    auto serverMessagePort =
-            xpc_connection_create_mach_service(vcam_agent.c_str(),
-                                               nullptr,
-                                               0);
+	auto serverMessagePort = xpc_connection_create_mach_service(vcam_agent.c_str(), nullptr, 0);
 
-    if (!serverMessagePort)
-        goto registerEndPoint_failed;
+	if (!serverMessagePort)
+		goto registerEndPoint_failed;
 
-    xpc_connection_set_event_handler(serverMessagePort,
-        ^(xpc_object_t event) {
-    });
-    xpc_connection_resume(serverMessagePort);
+	xpc_connection_set_event_handler(serverMessagePort, ^(xpc_object_t event){
+					 });
+	xpc_connection_resume(serverMessagePort);
 
-    messagePort = xpc_connection_create(nullptr, nullptr);
+	messagePort = xpc_connection_create(nullptr, nullptr);
 
-    if (!messagePort)
-        goto registerEndPoint_failed;
+	if (!messagePort)
+		goto registerEndPoint_failed;
 
-    xpc_connection_set_event_handler(messagePort, ^(xpc_object_t event) {
-        auto type = xpc_get_type(event);
+	xpc_connection_set_event_handler(messagePort, ^(xpc_object_t event) {
+		auto type = xpc_get_type(event);
 
-        if (type == XPC_TYPE_ERROR)
-            return;
+		if (type == XPC_TYPE_ERROR)
+			return;
 
-        auto client = reinterpret_cast<xpc_connection_t>(event);
+		auto client = reinterpret_cast<xpc_connection_t>(event);
 
-        xpc_connection_set_event_handler(client, ^(xpc_object_t event) {
-            this->messageReceived(client, event);
-        });
+		xpc_connection_set_event_handler(client, ^(xpc_object_t event) {
+			this->messageReceived(client, event);
+		});
 
-        xpc_connection_resume(client);
-    });
+		xpc_connection_resume(client);
+	});
 
-    xpc_connection_resume(messagePort);
+	xpc_connection_resume(messagePort);
 
-    dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
-    xpc_dictionary_set_int64(dictionary, "message", ADD_CONNECTION);
-    xpc_dictionary_set_bool(dictionary, "client", client);
-    xpc_dictionary_set_connection(dictionary, "connection", messagePort);
-    reply = xpc_connection_send_message_with_reply_sync(serverMessagePort,
-                                                        dictionary);
-    xpc_release(dictionary);
-    replyType = xpc_get_type(reply);
+	dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
+	xpc_dictionary_set_int64(dictionary, "message", ADD_CONNECTION);
+	xpc_dictionary_set_bool(dictionary, "client", client);
+	xpc_dictionary_set_connection(dictionary, "connection", messagePort);
+	reply = xpc_connection_send_message_with_reply_sync(serverMessagePort, dictionary);
+	xpc_release(dictionary);
+	replyType = xpc_get_type(reply);
 
-    if (replyType == XPC_TYPE_DICTIONARY) {
-        this->m_portName = 
-            xpc_dictionary_get_string(reply, "port");
-        status = xpc_dictionary_get_bool(reply, "status");
-    }
+	if (replyType == XPC_TYPE_DICTIONARY) {
+		this->m_portName = xpc_dictionary_get_string(reply, "port");
+		status = xpc_dictionary_get_bool(reply, "status");
+	}
 
-    xpc_release(reply);
+	xpc_release(reply);
 
-    if (replyType != XPC_TYPE_DICTIONARY || !status)
-        goto registerEndPoint_failed;
+	if (replyType != XPC_TYPE_DICTIONARY || !status)
+		goto registerEndPoint_failed;
 
-    this->m_messagePort = messagePort;
-    this->m_serverMessagePort = serverMessagePort;
+	this->m_messagePort = messagePort;
+	this->m_serverMessagePort = serverMessagePort;
 
-    return true;
+	return true;
 
 registerEndPoint_failed:
-    if (messagePort)
-        xpc_release(messagePort);
+	if (messagePort)
+		xpc_release(messagePort);
 
-    if (serverMessagePort)
-        xpc_release(serverMessagePort);
+	if (serverMessagePort)
+		xpc_release(serverMessagePort);
 
-    return false;
+	return false;
 }
 
-void VCAM_IPC::unregisterPeer() {
-    if (this->m_messagePort) {
-        xpc_release(this->m_messagePort);
-        this->m_messagePort = nullptr;
-    }
+void VCAM_IPC::unregisterPeer()
+{
+	if (this->m_messagePort) {
+		xpc_release(this->m_messagePort);
+		this->m_messagePort = nullptr;
+	}
 
-    if (this->m_serverMessagePort) {
-        if (!this->m_portName.empty()) {
-            auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
-            xpc_dictionary_set_int64(dictionary, "message", REMOVE_CONNECTION);
-            xpc_dictionary_set_string(dictionary, "port", this->m_portName.c_str());
-            xpc_connection_send_message(this->m_serverMessagePort,
-                                        dictionary);
-            xpc_release(dictionary);
-        }
+	if (this->m_serverMessagePort) {
+		if (!this->m_portName.empty()) {
+			auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
+			xpc_dictionary_set_int64(dictionary, "message", REMOVE_CONNECTION);
+			xpc_dictionary_set_string(dictionary, "port", this->m_portName.c_str());
+			xpc_connection_send_message(this->m_serverMessagePort, dictionary);
+			xpc_release(dictionary);
+		}
 
-        xpc_release(this->m_serverMessagePort);
-        this->m_serverMessagePort = nullptr;
-    }
+		xpc_release(this->m_serverMessagePort);
+		this->m_serverMessagePort = nullptr;
+	}
 
-    this->m_portName.clear();
+	this->m_portName.clear();
 }
 
-void VCAM_IPC::messageReceived(xpc_connection_t client, xpc_object_t event) {
-    auto type = xpc_get_type(event);
+void VCAM_IPC::messageReceived(xpc_connection_t client, xpc_object_t event)
+{
+	auto type = xpc_get_type(event);
 
-    if (type == XPC_TYPE_ERROR) {
-        auto description = xpc_copy_description(event);
-        free(description);
-    } else if (type == XPC_TYPE_DICTIONARY) {
-        auto message = xpc_dictionary_get_int64(event, "message");
+	if (type == XPC_TYPE_ERROR) {
+		auto description = xpc_copy_description(event);
+		free(description);
+	} else if (type == XPC_TYPE_DICTIONARY) {
+		auto message = xpc_dictionary_get_int64(event, "message");
 
-        auto it = this->functions.find((VCAM_IPC_EVENT) message);
-        if (it == this->functions.end())
-            return;
-        
-        it->second(client, event);
-    }
+		auto it = this->functions.find((VCAM_IPC_EVENT)message);
+		if (it == this->functions.end())
+			return;
+
+		it->second(client, event);
+	}
 }
 
-DeviceInfo *VCAM_IPC::getDevice() {
-    PrintFunction();
-    if (!this->m_serverMessagePort)
-        return nullptr;
+DeviceInfo *VCAM_IPC::getDevice()
+{
+	PrintFunction();
+	if (!this->m_serverMessagePort)
+		return nullptr;
 
-    auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
-    xpc_dictionary_set_int64(dictionary, "message", GET_DEVICE);
-    auto reply = xpc_connection_send_message_with_reply_sync(this->m_serverMessagePort,
-                                                                dictionary);
-    xpc_release(dictionary);
-    auto replyType = xpc_get_type(reply);
+	auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
+	xpc_dictionary_set_int64(dictionary, "message", GET_DEVICE);
+	auto reply = xpc_connection_send_message_with_reply_sync(this->m_serverMessagePort, dictionary);
+	xpc_release(dictionary);
+	auto replyType = xpc_get_type(reply);
 
-    if (replyType != XPC_TYPE_DICTIONARY) {
-        xpc_release(reply);
-        return nullptr;
-    }
+	if (replyType != XPC_TYPE_DICTIONARY) {
+		xpc_release(reply);
+		return nullptr;
+	}
 
-    DeviceInfo *device = new DeviceInfo();
-    device->deviceID = xpc_dictionary_get_string(reply, "device");
-    if (device->deviceID.empty()) {
-        xpc_release(reply);
-        return nullptr;
-    }
+	DeviceInfo *device = new DeviceInfo();
+	device->deviceID = xpc_dictionary_get_string(reply, "device");
+	if (device->deviceID.empty()) {
+		xpc_release(reply);
+		return nullptr;
+	}
 
-    device->name = xpc_dictionary_get_string(reply, "name");
-    device->width = xpc_dictionary_get_uint64(reply, "width");
-    device->height = xpc_dictionary_get_uint64(reply, "height");
-    device->fps = xpc_dictionary_get_double(reply, "fps");
-    return device;
+	device->name = xpc_dictionary_get_string(reply, "name");
+	device->width = xpc_dictionary_get_uint64(reply, "width");
+	device->height = xpc_dictionary_get_uint64(reply, "height");
+	device->fps = xpc_dictionary_get_double(reply, "fps");
+	return device;
 }
 
-bool VCAM_IPC::isHorizontalMirrored(const std::string &deviceId) {
-    PrintFunction();
+bool VCAM_IPC::isHorizontalMirrored(const std::string &deviceId)
+{
+	PrintFunction();
 
-    if (!this->m_serverMessagePort)
-        return false;
+	if (!this->m_serverMessagePort)
+		return false;
 
-    auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
-    xpc_dictionary_set_int64(dictionary, "message", MIRRORING);
-    xpc_dictionary_set_string(dictionary, "device", deviceId.c_str());
-    auto reply = xpc_connection_send_message_with_reply_sync(this->m_serverMessagePort,
-                                                             dictionary);
-    xpc_release(dictionary);
-    auto replyType = xpc_get_type(reply);
+	auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
+	xpc_dictionary_set_int64(dictionary, "message", MIRRORING);
+	xpc_dictionary_set_string(dictionary, "device", deviceId.c_str());
+	auto reply = xpc_connection_send_message_with_reply_sync(this->m_serverMessagePort, dictionary);
+	xpc_release(dictionary);
+	auto replyType = xpc_get_type(reply);
 
-    if (replyType != XPC_TYPE_DICTIONARY) {
-        xpc_release(reply);
+	if (replyType != XPC_TYPE_DICTIONARY) {
+		xpc_release(reply);
 
-        return false;
-    }
+		return false;
+	}
 
-    bool horizontalMirror = xpc_dictionary_get_bool(reply, "hmirror");
-    xpc_release(reply);
+	bool horizontalMirror = xpc_dictionary_get_bool(reply, "hmirror");
+	xpc_release(reply);
 
-    return horizontalMirror;
+	return horizontalMirror;
 }
 
-bool VCAM_IPC::isVerticalMirrored(const std::string &deviceId) {
-    PrintFunction();
+bool VCAM_IPC::isVerticalMirrored(const std::string &deviceId)
+{
+	PrintFunction();
 
-    if (!this->m_serverMessagePort)
-        return false;
+	if (!this->m_serverMessagePort)
+		return false;
 
-    auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
-    xpc_dictionary_set_int64(dictionary, "message", MIRRORING);
-    xpc_dictionary_set_string(dictionary, "device", deviceId.c_str());
-    auto reply = xpc_connection_send_message_with_reply_sync(this->m_serverMessagePort,
-                                                             dictionary);
-    xpc_release(dictionary);
-    auto replyType = xpc_get_type(reply);
+	auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
+	xpc_dictionary_set_int64(dictionary, "message", MIRRORING);
+	xpc_dictionary_set_string(dictionary, "device", deviceId.c_str());
+	auto reply = xpc_connection_send_message_with_reply_sync(this->m_serverMessagePort, dictionary);
+	xpc_release(dictionary);
+	auto replyType = xpc_get_type(reply);
 
-    if (replyType != XPC_TYPE_DICTIONARY) {
-        xpc_release(reply);
+	if (replyType != XPC_TYPE_DICTIONARY) {
+		xpc_release(reply);
 
-        return false;
-    }
+		return false;
+	}
 
-    bool verticalMirror = xpc_dictionary_get_bool(reply, "vmirror");
-    xpc_release(reply);
+	bool verticalMirror = xpc_dictionary_get_bool(reply, "vmirror");
+	xpc_release(reply);
 
-    return verticalMirror;
+	return verticalMirror;
 }
 
 std::string VCAM_IPC::homePath() const
 {
-    auto homePath = NSHomeDirectory();
+	auto homePath = NSHomeDirectory();
 
-    if (!homePath)
-        return {};
+	if (!homePath)
+		return {};
 
-    return std::string(homePath.UTF8String);
+	return std::string(homePath.UTF8String);
 }
 
 bool VCAM_IPC::fileExists(const std::wstring &path) const
 {
-    return this->fileExists(std::string(path.begin(), path.end()));
+	return this->fileExists(std::string(path.begin(), path.end()));
 }
 
 bool VCAM_IPC::fileExists(const std::string &path) const
 {
-    struct stat stats;
-    memset(&stats, 0, sizeof(struct stat));
+	struct stat stats;
+	memset(&stats, 0, sizeof(struct stat));
 
-    return stat(path.c_str(), &stats) == 0;
+	return stat(path.c_str(), &stats) == 0;
 }
 
 std::wstring VCAM_IPC::fileName(const std::wstring &path) const
 {
-    return path.substr(path.rfind(L'/') + 1);
+	return path.substr(path.rfind(L'/') + 1);
 }
 
 bool VCAM_IPC::mkpath(const std::string &path) const
 {
-    if (path.empty())
-        return false;
+	if (path.empty())
+		return false;
 
-    if (this->fileExists(path))
-        return true;
+	if (this->fileExists(path))
+		return true;
 
-    // Create parent folders
-    for (auto pos = path.find('/');
-         pos != std::string::npos;
-         pos = path.find('/', pos + 1)) {
-        auto path_ = path.substr(0, pos);
+	// Create parent folders
+	for (auto pos = path.find('/'); pos != std::string::npos; pos = path.find('/', pos + 1)) {
+		auto path_ = path.substr(0, pos);
 
-        if (path_.empty() || this->fileExists(path_))
-            continue;
+		if (path_.empty() || this->fileExists(path_))
+			continue;
 
-        if (mkdir(path_.c_str(),
-                  S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH))
-            return false;
-    }
+		if (mkdir(path_.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH))
+			return false;
+	}
 
-    return !mkdir(path.c_str(),
-                  S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+	return !mkdir(path.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 }
 
 bool createDaemonPlist(const std::string &fileName)
 {
-    PrintFunction();
-    std::fstream plistFile;
-    plistFile.open(fileName, std::ios_base::out);
+	PrintFunction();
+	std::fstream plistFile;
+	plistFile.open(fileName, std::ios_base::out);
 
-    if (!plistFile.is_open())
-        return false;
+	if (!plistFile.is_open())
+		return false;
 
-    plistFile << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl
-              << "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" "
-              << "\"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">"
-              << std::endl
-              << "<plist version=\"1.0\">" << std::endl
-              << "    <dict>" << std::endl
-              << "        <key>Label</key>" << std::endl
-              << "        <string>" << vcam_agent
-                                    << "</string>" << std::endl
-              << "        <key>ProgramArguments</key>" << std::endl
-              << "        <array>" << std::endl
-              << "            <string>" << vcam_plugin_path
-                                        << "/"
-                                        << vcam_plugin
-                                        << ".plugin/Contents/Resources/"
-                                        << vcam_assisant
-                                        << "</string>" << std::endl
-              << "            <string>--timeout</string>" << std::endl
-              << "            <string>300.0</string>" << std::endl
-              << "        </array>" << std::endl
-              << "        <key>MachServices</key>" << std::endl
-              << "        <dict>" << std::endl
-              << "            <key>" << vcam_agent
-                                     << "</key>" << std::endl
-              << "            <true/>" << std::endl
-              << "        </dict>" << std::endl;
-    plistFile << "    </dict>" << std::endl
-              << "</plist>" << std::endl;
+	plistFile << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl
+		  << "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" "
+		  << "\"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">" << std::endl
+		  << "<plist version=\"1.0\">" << std::endl
+		  << "    <dict>" << std::endl
+		  << "        <key>Label</key>" << std::endl
+		  << "        <string>" << vcam_agent << "</string>" << std::endl
+		  << "        <key>ProgramArguments</key>" << std::endl
+		  << "        <array>" << std::endl
+		  << "            <string>" << vcam_plugin_path << "/" << vcam_plugin << ".plugin/Contents/Resources/" << vcam_assisant << "</string>"
+		  << std::endl
+		  << "            <string>--timeout</string>" << std::endl
+		  << "            <string>300.0</string>" << std::endl
+		  << "        </array>" << std::endl
+		  << "        <key>MachServices</key>" << std::endl
+		  << "        <dict>" << std::endl
+		  << "            <key>" << vcam_agent << "</key>" << std::endl
+		  << "            <true/>" << std::endl
+		  << "        </dict>" << std::endl;
+	plistFile << "    </dict>" << std::endl << "</plist>" << std::endl;
 
-    std::cout << "success creating plist" << std::endl;
-    return true;
+	std::cout << "success creating plist" << std::endl;
+	return true;
 }
 
 std::string validDaemonPath = "";
 
 bool VCAM_IPC::loadDaemon()
 {
-    auto daemonsPath = replace(vcam_agent_path, "~", this->homePath());
-    if (!daemonsPath.empty())
-        validDaemonPath = daemonsPath;
+	auto daemonsPath = replace(vcam_agent_path, "~", this->homePath());
+	if (!daemonsPath.empty())
+		validDaemonPath = daemonsPath;
 
-    auto dstDaemonsPath = validDaemonPath + "/" + vcam_agent + ".plist";
+	auto dstDaemonsPath = validDaemonPath + "/" + vcam_agent + ".plist";
 
-    if (!this->fileExists(dstDaemonsPath)) {
-        this->mkpath(validDaemonPath);
-        std::cout << "Daemon file plist doesn't exist" << std::endl;
-        createDaemonPlist(dstDaemonsPath);
-    }
+	if (!this->fileExists(dstDaemonsPath)) {
+		this->mkpath(validDaemonPath);
+		std::cout << "Daemon file plist doesn't exist" << std::endl;
+		createDaemonPlist(dstDaemonsPath);
+	}
 
-    auto launchctl = popen(("launchctl load -w '" + dstDaemonsPath + "'").c_str(),
-                       "r");
+	auto launchctl = popen(("launchctl load -w '" + dstDaemonsPath + "'").c_str(), "r");
 
-    bool result = launchctl && !pclose(launchctl);
-    return result;
+	bool result = launchctl && !pclose(launchctl);
+	return result;
 }
 
 void VCAM_IPC::unloadDaemon() const
 {
-    PrintFunction();
-    std::string daemonPlist = vcam_agent + ".plist";
-    auto daemonsPath = replace(vcam_agent_path, "~", this->homePath());
-    auto dstDaemonsPath = daemonsPath + "/" + daemonPlist;
+	PrintFunction();
+	std::string daemonPlist = vcam_agent + ".plist";
+	auto daemonsPath = replace(vcam_agent_path, "~", this->homePath());
+	auto dstDaemonsPath = daemonsPath + "/" + daemonPlist;
 
-    if (!this->fileExists(dstDaemonsPath))
-        return ;
+	if (!this->fileExists(dstDaemonsPath))
+		return;
 
-    auto launchctl =
-            popen(("launchctl unload -w '" + dstDaemonsPath + "'").c_str(),
-                   "r");
+	auto launchctl = popen(("launchctl unload -w '" + dstDaemonsPath + "'").c_str(), "r");
 
-    bool result = launchctl && !pclose(launchctl);
+	bool result = launchctl && !pclose(launchctl);
 }

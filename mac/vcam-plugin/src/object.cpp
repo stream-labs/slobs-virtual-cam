@@ -39,7 +39,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "object.hpp"
 
-Object::Object(CMIOHardwarePlugInRef pluginInterface, Object *parent) : ObjectInterface(), m_pluginInterface(pluginInterface), m_parent(parent), m_isCreated(false)
+Object::Object(CMIOHardwarePlugInRef pluginInterface, Object *parent)
+	: ObjectInterface(), m_pluginInterface(pluginInterface), m_parent(parent), m_isCreated(false)
 {
 	this->m_className = "Object";
 	this->m_properties.setProperty(kCMIOObjectPropertyOwnedObjects, std::vector<Object *>());
@@ -110,7 +111,8 @@ OSStatus Object::propertyChanged(UInt32 numberAddresses, const CMIOObjectPropert
 	return CMIOObjectPropertiesChanged(this->m_pluginInterface, this->m_objectID, numberAddresses, addresses);
 }
 
-OSStatus Object::setPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, const void *data)
+OSStatus Object::setPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize,
+				 const void *data)
 {
 	auto status = ObjectInterface::setPropertyData(address, qualifierDataSize, qualifierData, dataSize, data);
 

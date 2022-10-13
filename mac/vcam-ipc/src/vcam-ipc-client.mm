@@ -43,139 +43,131 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <IOSurface/IOSurface.h>
 #include <CoreMedia/CMFormatDescription.h>
 
-VCAM_IPC_Client::VCAM_IPC_Client() {
+VCAM_IPC_Client::VCAM_IPC_Client() {}
 
+VCAM_IPC_Client::~VCAM_IPC_Client() {}
+
+std::string VCAM_IPC_Client::deviceCreate(std::string name, uint32_t width, uint32_t height, double fps)
+{
+	PrintFunction();
+
+	this->registerPeer(false);
+
+	if (!this->m_serverMessagePort || !this->m_messagePort)
+		return {};
+
+	auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
+	xpc_dictionary_set_int64(dictionary, "message", CREATE_DEVICE);
+	xpc_dictionary_set_string(dictionary, "port", this->m_portName.c_str());
+	xpc_dictionary_set_string(dictionary, "name", name.c_str());
+	xpc_dictionary_set_uint64(dictionary, "width", width);
+	xpc_dictionary_set_uint64(dictionary, "height", height);
+	xpc_dictionary_set_double(dictionary, "fps", fps);
+
+	auto reply = xpc_connection_send_message_with_reply_sync(this->m_serverMessagePort, dictionary);
+	xpc_release(dictionary);
+	auto replyType = xpc_get_type(reply);
+
+	if (replyType != XPC_TYPE_DICTIONARY) {
+		xpc_release(reply);
+		return {};
+	}
+
+	std::string deviceId(xpc_dictionary_get_string(reply, "device"));
+	xpc_release(reply);
+
+	return deviceId;
 }
 
-VCAM_IPC_Client::~VCAM_IPC_Client() {
+bool VCAM_IPC_Client::deviceDestroy(const std::string &deviceId)
+{
+	PrintFunction();
 
+	if (!this->m_serverMessagePort)
+		return false;
+
+	auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
+	xpc_dictionary_set_int64(dictionary, "message", REMOVE_DEVICE);
+	xpc_dictionary_set_string(dictionary, "device", deviceId.c_str());
+	xpc_connection_send_message(this->m_serverMessagePort, dictionary);
+	xpc_release(dictionary);
+
+	return true;
 }
 
-std::string VCAM_IPC_Client::deviceCreate(std::string name, 
-    uint32_t width, uint32_t height, double fps) {
-    PrintFunction();
+bool VCAM_IPC_Client::destroyAllDevices()
+{
+	PrintFunction();
 
-    this->registerPeer(false);
-
-    if (!this->m_serverMessagePort || !this->m_messagePort)
-        return {};
-
-    auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
-    xpc_dictionary_set_int64(dictionary, "message", CREATE_DEVICE);
-    xpc_dictionary_set_string(dictionary, "port", this->m_portName.c_str());
-    xpc_dictionary_set_string(dictionary, "name", name.c_str());
-    xpc_dictionary_set_uint64(dictionary, "width", width);
-    xpc_dictionary_set_uint64(dictionary, "height", height);
-    xpc_dictionary_set_double(dictionary, "fps", fps);
-
-    auto reply = xpc_connection_send_message_with_reply_sync(this->m_serverMessagePort,
-                                                             dictionary);
-    xpc_release(dictionary);
-    auto replyType = xpc_get_type(reply);
-
-    if (replyType != XPC_TYPE_DICTIONARY) {
-        xpc_release(reply);
-        return {};
-    }
-
-    std::string deviceId(xpc_dictionary_get_string(reply, "device"));
-    xpc_release(reply);
-
-    return deviceId;
+	return true;
 }
 
-bool VCAM_IPC_Client::deviceDestroy(const std::string &deviceId) {
-    PrintFunction();
+bool VCAM_IPC_Client::deviceUploadFrame(const std::string deviceID, uint32_t surfaceID, const uint8_t *frame, uint32_t size)
+{
+	// PrintFunction();
 
-    if (!this->m_serverMessagePort)
-        return false;
+	if (!this->m_serverMessagePort)
+		return false;
 
-    auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
-    xpc_dictionary_set_int64(dictionary, "message", REMOVE_DEVICE);
-    xpc_dictionary_set_string(dictionary, "device", deviceId.c_str());
-    xpc_connection_send_message(this->m_serverMessagePort,
-                                dictionary);
-    xpc_release(dictionary);
+	auto surface = IOSurfaceLookup((IOSurfaceID)surfaceID);
+	if (!surface)
+		return false;
 
-    return true;
+	uint32_t surfaceSeed = 0;
+	IOSurfaceLock(surface, 0, &surfaceSeed);
+
+	auto data = IOSurfaceGetBaseAddress(surface);
+	if (!frame)
+		return false;
+	memcpy(data, frame, size);
+
+	IOSurfaceUnlock(surface, 0, &surfaceSeed);
+	auto surfaceObj = IOSurfaceCreateXPCObject(surface);
+
+	auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
+	xpc_dictionary_set_int64(dictionary, "message", FRAME);
+	xpc_dictionary_set_string(dictionary, "device", deviceID.c_str());
+	xpc_dictionary_set_value(dictionary, "frame", surfaceObj);
+	auto reply = xpc_connection_send_message_with_reply_sync(this->m_serverMessagePort, dictionary);
+	bool res = xpc_dictionary_get_bool(reply, "status");
+	xpc_release(dictionary);
+	xpc_release(reply);
+	xpc_release(surfaceObj);
+
+	return res;
+}
+void VCAM_IPC_Client::setMirroring(const std::string &deviceId, bool horizontalMirrored, bool verticalMirrored)
+{
+	PrintFunction();
+
+	if (!this->m_serverMessagePort)
+		return;
+
+	auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
+	xpc_dictionary_set_int64(dictionary, "message", SET_MIRRORING);
+	xpc_dictionary_set_string(dictionary, "device", deviceId.c_str());
+	xpc_dictionary_set_bool(dictionary, "hmirror", horizontalMirrored);
+	xpc_dictionary_set_bool(dictionary, "vmirror", verticalMirrored);
+	auto reply = xpc_connection_send_message_with_reply_sync(this->m_serverMessagePort, dictionary);
+	xpc_release(dictionary);
+	xpc_release(reply);
 }
 
-bool VCAM_IPC_Client::destroyAllDevices() {
-    PrintFunction();
+bool VCAM_IPC_Client::startDaemon()
+{
+	PrintFunction();
 
-    return true;
+	return this->loadDaemon();
 }
 
-bool VCAM_IPC_Client::deviceUploadFrame(const std::string deviceID,
-                    uint32_t surfaceID,
-                    const uint8_t *frame,
-                    uint32_t size) {
-    // PrintFunction();
+void VCAM_IPC_Client::removeDaemon()
+{
+	PrintFunction();
 
-    if (!this->m_serverMessagePort)
-        return false;
+	this->unloadDaemon();
 
-    auto surface = IOSurfaceLookup((IOSurfaceID) surfaceID);
-    if (!surface)
-        return false;
+	auto daemonsPath = replace(vcam_agent_path, "~", this->homePath());
 
-    uint32_t surfaceSeed = 0;
-    IOSurfaceLock(surface, 0, &surfaceSeed);
-    
-    auto data = IOSurfaceGetBaseAddress(surface);
-    if (!frame)
-        return false;
-    memcpy(data, frame, size);
-
-    IOSurfaceUnlock(surface, 0, &surfaceSeed);
-    auto surfaceObj = IOSurfaceCreateXPCObject(surface);
-
-    auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
-    xpc_dictionary_set_int64(dictionary, "message", FRAME);
-    xpc_dictionary_set_string(dictionary, "device", deviceID.c_str());
-    xpc_dictionary_set_value(dictionary, "frame", surfaceObj);
-    auto reply = xpc_connection_send_message_with_reply_sync(this->m_serverMessagePort,
-                                                             dictionary);
-    bool res = xpc_dictionary_get_bool(reply, "status"); 
-    xpc_release(dictionary);
-    xpc_release(reply);
-    xpc_release(surfaceObj);
-
-    return res;
-}
-void VCAM_IPC_Client::setMirroring(const std::string &deviceId,
-                    bool horizontalMirrored,
-                    bool verticalMirrored) {
-    PrintFunction();
-
-    if (!this->m_serverMessagePort)
-        return;
-
-    auto dictionary = xpc_dictionary_create(nullptr, nullptr, 0);
-    xpc_dictionary_set_int64(dictionary, "message", SET_MIRRORING);
-    xpc_dictionary_set_string(dictionary, "device", deviceId.c_str());
-    xpc_dictionary_set_bool(dictionary, "hmirror", horizontalMirrored);
-    xpc_dictionary_set_bool(dictionary, "vmirror", verticalMirrored);
-    auto reply = xpc_connection_send_message_with_reply_sync(this->m_serverMessagePort,
-                                                             dictionary);
-    xpc_release(dictionary);
-    xpc_release(reply);
-}
-
-bool VCAM_IPC_Client::startDaemon() {
-    PrintFunction();
-
-    return this->loadDaemon();
-}
-
-void VCAM_IPC_Client::removeDaemon() {
-    PrintFunction();
-
-    this->unloadDaemon();
-
-    auto daemonsPath =
-        replace(vcam_agent_path, "~", this->homePath());
-
-    std::string daemon = daemonsPath + "/" + vcam_agent + ".plist";
-    ::remove(daemon.c_str());
+	std::string daemon = daemonsPath + "/" + vcam_agent + ".plist";
+	::remove(daemon.c_str());
 }

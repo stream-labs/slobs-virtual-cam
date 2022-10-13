@@ -121,7 +121,8 @@ public:
 	bool getProperty(UInt32 property, Float64 *value);
 	bool getProperty(UInt32 property, std::string *value);
 	bool getProperty(UInt32 property, FrameInfo *value);
-	bool getProperty(UInt32 property, UInt32 qualifierDataSize = 0, const void *qualifierData = nullptr, UInt32 dataSize = 0, UInt32 *dataUsed = nullptr, void *data = nullptr);
+	bool getProperty(UInt32 property, UInt32 qualifierDataSize = 0, const void *qualifierData = nullptr, UInt32 dataSize = 0, UInt32 *dataUsed = nullptr,
+			 void *data = nullptr);
 
 	void removeProperty(UInt32 property);
 	void update(const ObjectProperties &other);

@@ -60,7 +60,8 @@ public:
 	Object *findObject(CMIOObjectID objectID);
 	OSStatus propertyChanged(UInt32 numberAddresses, const CMIOObjectPropertyAddress *addresses);
 
-	OSStatus setPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, const void *data);
+	OSStatus setPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize,
+				 const void *data);
 
 private:
 	void childsUpdate();

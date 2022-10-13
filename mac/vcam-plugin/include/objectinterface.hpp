@@ -63,9 +63,10 @@ public:
 	virtual Boolean hasProperty(const CMIOObjectPropertyAddress *address);
 	virtual OSStatus isPropertySettable(const CMIOObjectPropertyAddress *address, Boolean *isSettable);
 	virtual OSStatus getPropertyDataSize(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 *dataSize);
-	virtual OSStatus getPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, UInt32 *dataUsed,
-					 void *data);
-	virtual OSStatus setPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, const void *data);
+	virtual OSStatus getPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize,
+					 UInt32 *dataUsed, void *data);
+	virtual OSStatus setPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize,
+					 const void *data);
 
 protected:
 	CMIOObjectID m_objectID;

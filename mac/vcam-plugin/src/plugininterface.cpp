@@ -66,21 +66,22 @@ public:
 	static OSStatus Teardown(CMIOHardwarePlugInRef self);
 	static void ObjectShow(CMIOHardwarePlugInRef self, CMIOObjectID objectID);
 	static Boolean ObjectHasProperty(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address);
-	static OSStatus ObjectIsPropertySettable(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address, Boolean *isSettable);
-	static OSStatus ObjectGetPropertyDataSize(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize,
-						  const void *qualifierData, UInt32 *dataSize);
-	static OSStatus ObjectGetPropertyData(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize,
-					      const void *qualifierData, UInt32 dataSize, UInt32 *dataUsed, void *data);
-	static OSStatus ObjectSetPropertyData(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize,
-					      const void *qualifierData, UInt32 dataSize, const void *data);
+	static OSStatus ObjectIsPropertySettable(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address,
+						 Boolean *isSettable);
+	static OSStatus ObjectGetPropertyDataSize(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address,
+						  UInt32 qualifierDataSize, const void *qualifierData, UInt32 *dataSize);
+	static OSStatus ObjectGetPropertyData(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address,
+					      UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, UInt32 *dataUsed, void *data);
+	static OSStatus ObjectSetPropertyData(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address,
+					      UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, const void *data);
 	static OSStatus DeviceSuspend(CMIOHardwarePlugInRef self, CMIODeviceID device);
 	static OSStatus DeviceResume(CMIOHardwarePlugInRef self, CMIODeviceID device);
 	static OSStatus DeviceStartStream(CMIOHardwarePlugInRef self, CMIODeviceID device, CMIOStreamID stream);
 	static OSStatus DeviceStopStream(CMIOHardwarePlugInRef self, CMIODeviceID device, CMIOStreamID stream);
 	static OSStatus DeviceProcessAVCCommand(CMIOHardwarePlugInRef self, CMIODeviceID device, CMIODeviceAVCCommand *ioAVCCommand);
 	static OSStatus DeviceProcessRS422Command(CMIOHardwarePlugInRef self, CMIODeviceID device, CMIODeviceRS422Command *ioRS422Command);
-	static OSStatus StreamCopyBufferQueue(CMIOHardwarePlugInRef self, CMIOStreamID stream, CMIODeviceStreamQueueAlteredProc queueAlteredProc, void *queueAlteredRefCon,
-					      CMSimpleQueueRef *queue);
+	static OSStatus StreamCopyBufferQueue(CMIOHardwarePlugInRef self, CMIOStreamID stream, CMIODeviceStreamQueueAlteredProc queueAlteredProc,
+					      void *queueAlteredRefCon, CMSimpleQueueRef *queue);
 	static OSStatus StreamDeckPlay(CMIOHardwarePlugInRef self, CMIOStreamID stream);
 	static OSStatus StreamDeckStop(CMIOHardwarePlugInRef self, CMIOStreamID stream);
 	static OSStatus StreamDeckJog(CMIOHardwarePlugInRef self, CMIOStreamID stream, SInt32 speed);
@@ -100,12 +101,13 @@ PluginInterface::PluginInterface() : ObjectInterface(), m_objectID(0)
 		PluginInterfacePrivate::QueryInterface, PluginInterfacePrivate::AddRef, PluginInterfacePrivate::Release,
 
 		// DAL Plug-In Routines
-		PluginInterfacePrivate::Initialize, PluginInterfacePrivate::InitializeWithObjectID, PluginInterfacePrivate::Teardown, PluginInterfacePrivate::ObjectShow,
-		PluginInterfacePrivate::ObjectHasProperty, PluginInterfacePrivate::ObjectIsPropertySettable, PluginInterfacePrivate::ObjectGetPropertyDataSize,
-		PluginInterfacePrivate::ObjectGetPropertyData, PluginInterfacePrivate::ObjectSetPropertyData, PluginInterfacePrivate::DeviceSuspend,
-		PluginInterfacePrivate::DeviceResume, PluginInterfacePrivate::DeviceStartStream, PluginInterfacePrivate::DeviceStopStream,
-		PluginInterfacePrivate::DeviceProcessAVCCommand, PluginInterfacePrivate::DeviceProcessRS422Command, PluginInterfacePrivate::StreamCopyBufferQueue,
-		PluginInterfacePrivate::StreamDeckPlay, PluginInterfacePrivate::StreamDeckStop, PluginInterfacePrivate::StreamDeckJog, PluginInterfacePrivate::StreamDeckCueTo};
+		PluginInterfacePrivate::Initialize, PluginInterfacePrivate::InitializeWithObjectID, PluginInterfacePrivate::Teardown,
+		PluginInterfacePrivate::ObjectShow, PluginInterfacePrivate::ObjectHasProperty, PluginInterfacePrivate::ObjectIsPropertySettable,
+		PluginInterfacePrivate::ObjectGetPropertyDataSize, PluginInterfacePrivate::ObjectGetPropertyData, PluginInterfacePrivate::ObjectSetPropertyData,
+		PluginInterfacePrivate::DeviceSuspend, PluginInterfacePrivate::DeviceResume, PluginInterfacePrivate::DeviceStartStream,
+		PluginInterfacePrivate::DeviceStopStream, PluginInterfacePrivate::DeviceProcessAVCCommand, PluginInterfacePrivate::DeviceProcessRS422Command,
+		PluginInterfacePrivate::StreamCopyBufferQueue, PluginInterfacePrivate::StreamDeckPlay, PluginInterfacePrivate::StreamDeckStop,
+		PluginInterfacePrivate::StreamDeckJog, PluginInterfacePrivate::StreamDeckCueTo};
 	this->d->m_ref = 0;
 	this->d->m_reserved = 0;
 
@@ -451,7 +453,8 @@ Boolean PluginInterfacePrivate::ObjectHasProperty(CMIOHardwarePlugInRef self, CM
 	return result;
 }
 
-OSStatus PluginInterfacePrivate::ObjectIsPropertySettable(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address, Boolean *isSettable)
+OSStatus PluginInterfacePrivate::ObjectIsPropertySettable(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address,
+							  Boolean *isSettable)
 {
 	// PrintFunctionID(objectID);
 	PrintFunction();
@@ -470,8 +473,8 @@ OSStatus PluginInterfacePrivate::ObjectIsPropertySettable(CMIOHardwarePlugInRef 
 	return status;
 }
 
-OSStatus PluginInterfacePrivate::ObjectGetPropertyDataSize(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize,
-							   const void *qualifierData, UInt32 *dataSize)
+OSStatus PluginInterfacePrivate::ObjectGetPropertyDataSize(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address,
+							   UInt32 qualifierDataSize, const void *qualifierData, UInt32 *dataSize)
 {
 	// PrintFunctionID(objectID);
 	PrintFunction();
@@ -490,8 +493,8 @@ OSStatus PluginInterfacePrivate::ObjectGetPropertyDataSize(CMIOHardwarePlugInRef
 	return status;
 }
 
-OSStatus PluginInterfacePrivate::ObjectGetPropertyData(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize,
-						       const void *qualifierData, UInt32 dataSize, UInt32 *dataUsed, void *data)
+OSStatus PluginInterfacePrivate::ObjectGetPropertyData(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address,
+						       UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, UInt32 *dataUsed, void *data)
 {
 	// PrintFunctionID(objectID);
 	OSStatus status = kCMIOHardwareUnspecifiedError;
@@ -509,8 +512,8 @@ OSStatus PluginInterfacePrivate::ObjectGetPropertyData(CMIOHardwarePlugInRef sel
 	return status;
 }
 
-OSStatus PluginInterfacePrivate::ObjectSetPropertyData(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize,
-						       const void *qualifierData, UInt32 dataSize, const void *data)
+OSStatus PluginInterfacePrivate::ObjectSetPropertyData(CMIOHardwarePlugInRef self, CMIOObjectID objectID, const CMIOObjectPropertyAddress *address,
+						       UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, const void *data)
 {
 	PrintFunction();
 	OSStatus status = kCMIOHardwareUnspecifiedError;
@@ -630,8 +633,8 @@ OSStatus PluginInterfacePrivate::DeviceProcessRS422Command(CMIOHardwarePlugInRef
 	return status;
 }
 
-OSStatus PluginInterfacePrivate::StreamCopyBufferQueue(CMIOHardwarePlugInRef self, CMIOStreamID stream, CMIODeviceStreamQueueAlteredProc queueAlteredProc, void *queueAlteredRefCon,
-						       CMSimpleQueueRef *queue)
+OSStatus PluginInterfacePrivate::StreamCopyBufferQueue(CMIOHardwarePlugInRef self, CMIOStreamID stream, CMIODeviceStreamQueueAlteredProc queueAlteredProc,
+						       void *queueAlteredRefCon, CMSimpleQueueRef *queue)
 {
 	PrintFunction();
 	OSStatus status = kCMIOHardwareUnspecifiedError;
