@@ -412,8 +412,8 @@ bool ObjectProperties::getProperty(UInt32 property, UInt32 qualifierDataSize, co
 
 		if (ok && data) {
 			auto videoFormat = this->m_properties[property].videoFormat;
-			auto status = CMVideoFormatDescriptionCreate(kCFAllocatorDefault, videoFormat.pix_format, videoFormat.width, videoFormat.height, nullptr,
-								     static_cast<CMFormatDescriptionRef *>(data));
+			auto status = CMVideoFormatDescriptionCreate(kCFAllocatorDefault, videoFormat.pix_format, videoFormat.width, videoFormat.height,
+								     nullptr, static_cast<CMFormatDescriptionRef *>(data));
 
 			if (status != noErr)
 				ok = false;
@@ -434,7 +434,8 @@ bool ObjectProperties::getProperty(UInt32 property, UInt32 qualifierDataSize, co
 
 			for (auto &format : videoFormats) {
 				CMFormatDescriptionRef formatRef = nullptr;
-				auto status = CMVideoFormatDescriptionCreate(kCFAllocatorDefault, format.pix_format, format.width, format.height, nullptr, &formatRef);
+				auto status = CMVideoFormatDescriptionCreate(kCFAllocatorDefault, format.pix_format, format.width, format.height, nullptr,
+									     &formatRef);
 
 				if (status == noErr)
 					formats.push_back(formatRef);

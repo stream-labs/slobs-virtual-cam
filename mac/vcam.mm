@@ -39,7 +39,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "vcam.hpp"
 
-
 #include <IOSurface/IOSurface.h>
 #include <locale>
 #include <codecvt>
@@ -49,78 +48,73 @@ std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
 VirtualCam::VirtualCam()
 {
-    this->ipc_client.connect(false);
+	this->ipc_client.connect(false);
 }
 
 VirtualCam::~VirtualCam()
 {
-    this->ipc_client.disconnect();
+	this->ipc_client.disconnect();
 }
 
 bool VirtualCam::createWebcam(const std::string name, int width, int height, double fps)
 {
-    this->name   = name;
-    this->width  = width;
-    this->height = height;
-    this->fps    = fps;
+	this->name = name;
+	this->width = width;
+	this->height = height;
+	this->fps = fps;
 
-    this->deviceID =
-        this->ipc_client.deviceCreate(this->name, this->width, this->height, this->fps);
-    if (this->deviceID.empty())
-        return false;
+	this->deviceID = this->ipc_client.deviceCreate(this->name, this->width, this->height, this->fps);
+	if (this->deviceID.empty())
+		return false;
 
-    this->surfaceID      = this->createSharedMemory();
-    return true;
+	this->surfaceID = this->createSharedMemory();
+	return true;
 }
 
 uint32_t VirtualCam::createSharedMemory()
 {
-	NSDictionary* surfaceAttributes = 
-        [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithBool:YES], (NSString*)kIOSurfaceIsGlobal,
-        [NSNumber numberWithUnsignedInteger:(NSUInteger)this->width], (NSString*)kIOSurfaceWidth,
-        [NSNumber numberWithUnsignedInteger:(NSUInteger)this->height], (NSString*)kIOSurfaceHeight,
-        [NSNumber numberWithUnsignedInteger:2U], (NSString*)kIOSurfaceBytesPerElement, nil];
+	NSDictionary *surfaceAttributes =
+		[[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithBool:YES], (NSString *)kIOSurfaceIsGlobal,
+							     [NSNumber numberWithUnsignedInteger:(NSUInteger)this->width], (NSString *)kIOSurfaceWidth,
+							     [NSNumber numberWithUnsignedInteger:(NSUInteger)this->height], (NSString *)kIOSurfaceHeight,
+							     [NSNumber numberWithUnsignedInteger:2U], (NSString *)kIOSurfaceBytesPerElement, nil];
 
-	auto surface =  IOSurfaceCreate((CFDictionaryRef) surfaceAttributes);
+	auto surface = IOSurfaceCreate((CFDictionaryRef)surfaceAttributes);
 	CFRelease(surfaceAttributes);
 
-    if (surface)
-        return IOSurfaceGetID(surface);
-    else
-        return 0;
+	if (surface)
+		return IOSurfaceGetID(surface);
+	else
+		return 0;
 }
 
 bool VirtualCam::removeWebcam()
 {
-    return this->ipc_client.deviceDestroy(this->deviceID);
+	return this->ipc_client.deviceDestroy(this->deviceID);
 }
 
 bool VirtualCam::removeAllWebcams()
 {
-    return this->ipc_client.destroyAllDevices();
+	return this->ipc_client.destroyAllDevices();
 }
 
 bool VirtualCam::startDaemon()
 {
-    return this->ipc_client.startDaemon();
+	return this->ipc_client.startDaemon();
 }
 
 bool VirtualCam::removeDaemon()
 {
-    this->ipc_client.removeDaemon();
+	this->ipc_client.removeDaemon();
 }
 
 bool VirtualCam::uploadFrame(const uint8_t *frame)
 {
-    uint32_t size = this->width * this->height * BYTES_PER_PIXEL;
-    return this->ipc_client.deviceUploadFrame(
-        deviceID,
-        this->surfaceID,
-        frame,
-        size);
+	uint32_t size = this->width * this->height * BYTES_PER_PIXEL;
+	return this->ipc_client.deviceUploadFrame(deviceID, this->surfaceID, frame, size);
 }
 
 void VirtualCam::setHorizontalMirroring(bool state)
 {
-    this->ipc_client.setMirroring(this->deviceID, state, true);
+	this->ipc_client.setMirroring(this->deviceID, state, true);
 }

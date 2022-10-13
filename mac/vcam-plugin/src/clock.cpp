@@ -41,7 +41,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "clock.hpp"
 
-Clock::Clock(const std::string &name, const CMTime getTimeCallMinimumInterval, UInt32 numberOfEventsForRateSmoothing, UInt32 numberOfAveragesForRateSmoothing, void *parent)
+Clock::Clock(const std::string &name, const CMTime getTimeCallMinimumInterval, UInt32 numberOfEventsForRateSmoothing, UInt32 numberOfAveragesForRateSmoothing,
+	     void *parent)
 	: m_parent(parent), m_clock(nullptr)
 {
 	auto nameRef = CFStringCreateWithCString(kCFAllocatorDefault, name.c_str(), kCFStringEncodingUTF8);

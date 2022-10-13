@@ -147,7 +147,8 @@ static void receive_raw_video(void *param, struct video_data *frame)
 	uint32_t dest_linesize[MAX_AV_PLANES];
 	dest_linesize[0] = output->VCAM->width * 2;
 
-	int hightOutput = sws_scale(output->scaler, frame->data, (const int *)frame->linesize, 0, ovi.output_height, converted_frame, (const int *)dest_linesize);
+	int hightOutput =
+		sws_scale(output->scaler, frame->data, (const int *)frame->linesize, 0, ovi.output_height, converted_frame, (const int *)dest_linesize);
 
 	output->VCAM->uploadFrame((const uint8_t *)converted_frame[0]);
 	bfree(converted_frame[0]);

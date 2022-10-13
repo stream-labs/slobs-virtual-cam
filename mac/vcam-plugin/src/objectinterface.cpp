@@ -113,8 +113,8 @@ OSStatus ObjectInterface::getPropertyDataSize(const CMIOObjectPropertyAddress *a
 	return kCMIOHardwareNoError;
 }
 
-OSStatus ObjectInterface::getPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, UInt32 *dataUsed,
-					  void *data)
+OSStatus ObjectInterface::getPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize,
+					  UInt32 *dataUsed, void *data)
 {
 	PrintFunction();
 
@@ -125,7 +125,8 @@ OSStatus ObjectInterface::getPropertyData(const CMIOObjectPropertyAddress *addre
 	return kCMIOHardwareNoError;
 }
 
-OSStatus ObjectInterface::setPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize, const void *data)
+OSStatus ObjectInterface::setPropertyData(const CMIOObjectPropertyAddress *address, UInt32 qualifierDataSize, const void *qualifierData, UInt32 dataSize,
+					  const void *data)
 {
 	PrintFunction();
 
