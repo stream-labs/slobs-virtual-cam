@@ -39,6 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "vcam.hpp"
 
+#include <Foundation/Foundation.h>
 #include <IOSurface/IOSurface.h>
 #include <locale>
 #include <codecvt>
