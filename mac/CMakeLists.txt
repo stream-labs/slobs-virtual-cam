@@ -40,6 +40,8 @@ add_library(${PROJECT_NAME} MODULE
 	${PROJECT_SOURCE}
 )
 
+target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-unused-parameter")
+
 target_link_libraries(
     slobs-virtual-cam
 	libobs
