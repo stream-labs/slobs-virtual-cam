@@ -147,7 +147,7 @@ void Assistant::stopTimer()
 	this->m_timer = nullptr;
 }
 
-void Assistant::timerTimeout(CFRunLoopTimerRef timer, void *info)
+void Assistant::timerTimeout(CFRunLoopTimerRef, void *)
 {
 	CFRunLoopStop(CFRunLoopGetMain());
 }
@@ -188,7 +188,7 @@ void Assistant::addConnection(xpc_connection_t client, xpc_object_t event)
 	xpc_release(reply);
 }
 
-void Assistant::removeConnection(xpc_connection_t client, xpc_object_t event)
+void Assistant::removeConnection(xpc_connection_t, xpc_object_t event)
 {
 	auto portName = xpc_dictionary_get_string(event, "port");
 
@@ -266,7 +266,7 @@ void Assistant::deviceDestroyById(const std::string &deviceId)
 	}
 }
 
-void Assistant::deviceDestroy(xpc_connection_t client, xpc_object_t event)
+void Assistant::deviceDestroy(xpc_connection_t, xpc_object_t event)
 {
 	PrintFunction();
 	std::string deviceId = xpc_dictionary_get_string(event, "device");
