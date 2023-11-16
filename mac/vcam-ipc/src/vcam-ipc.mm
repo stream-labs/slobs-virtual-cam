@@ -99,7 +99,7 @@ bool VCAM_IPC::registerPeer(bool client)
 	if (!serverMessagePort)
 		goto registerEndPoint_failed;
 
-	xpc_connection_set_event_handler(serverMessagePort, ^(xpc_object_t event){
+	xpc_connection_set_event_handler(serverMessagePort, ^(xpc_object_t){
 					 });
 	xpc_connection_resume(serverMessagePort);
 
