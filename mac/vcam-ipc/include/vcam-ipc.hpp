@@ -52,7 +52,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "vcam-ipc-constants.h"
 #include "signal.h"
 
+#ifndef PrintFunction
 #define PrintFunction() Print("VCAM-IPC::", __FUNCTION__, "()")
+#endif
 
 typedef std::function<void(xpc_connection_t, xpc_object_t)> Function;
 

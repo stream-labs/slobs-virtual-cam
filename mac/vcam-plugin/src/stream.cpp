@@ -293,13 +293,13 @@ void Stream::streamLoop(CFRunLoopTimerRef timer, void *info)
 
 void doHorrizontalMirror(uint32_t height, uint32_t width, const uint8_t *source, uint8_t *dest)
 {
-	int linesize = width * 2;
-	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < linesize; x += 4) {
-			dest[y * linesize + x] = source[y * linesize + linesize - x];
-			dest[y * linesize + x + 1] = source[y * linesize + linesize - x - 1];
+	uint32_t linesize = width * 2;
+	for (uint32_t y = 0; y < height; y++) {
+		for (uint32_t x = 0; x < linesize; x += 4) {
+			dest[y * linesize + x] = source[y * linesize + linesize - x - 4];
+			dest[y * linesize + x + 1] = source[y * linesize + linesize - x - 3];
 			dest[y * linesize + x + 2] = source[y * linesize + linesize - x - 2];
-			dest[y * linesize + x + 3] = source[y * linesize + linesize - x - 3];
+			dest[y * linesize + x + 3] = source[y * linesize + linesize - x - 1];
 		}
 	}
 }
