@@ -62,7 +62,7 @@ VCAM_IPC_Server::~VCAM_IPC_Server()
 	this->unregisterFunction(SET_MIRRORING);
 }
 
-void VCAM_IPC_Server::deviceCreate(xpc_connection_t client, xpc_object_t event)
+void VCAM_IPC_Server::deviceCreate(xpc_connection_t, xpc_object_t event)
 {
 	PrintFunction();
 
@@ -75,7 +75,7 @@ void VCAM_IPC_Server::deviceCreate(xpc_connection_t client, xpc_object_t event)
 	EMIT(this, DeviceAdded, device, name, width, height, fps)
 }
 
-void VCAM_IPC_Server::deviceDestroy(xpc_connection_t client, xpc_object_t event)
+void VCAM_IPC_Server::deviceDestroy(xpc_connection_t, xpc_object_t event)
 {
 	PrintFunction();
 
@@ -105,7 +105,7 @@ void VCAM_IPC_Server::frameReady(xpc_connection_t client, xpc_object_t event)
 	xpc_release(reply);
 }
 
-void VCAM_IPC_Server::setMirror(xpc_connection_t client, xpc_object_t event)
+void VCAM_IPC_Server::setMirror(xpc_connection_t, xpc_object_t event)
 {
 	PrintFunction();
 	std::string deviceId = xpc_dictionary_get_string(event, "device");
