@@ -45,7 +45,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "objectproperties.hpp"
 
+#ifndef PrintFunction
 #define PrintFunction() Print("VCAM-PLUGIN::", __FUNCTION__, "()")
+#endif
 
 class ObjectInterface {
 public:

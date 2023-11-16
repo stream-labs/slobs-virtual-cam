@@ -46,7 +46,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
 
+#ifndef PrintFunction
 #define PrintFunction() Print("VCAM-ASSISTANT::", __FUNCTION__, "()")
+#endif
 
 Assistant::Assistant()
 {
