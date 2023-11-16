@@ -75,7 +75,7 @@ bool VirtualCam::createWebcam(const std::string name, int width, int height, dou
 uint32_t VirtualCam::createSharedMemory()
 {
 	NSDictionary *surfaceAttributes =
-		[[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithBool:YES], (NSString *)kIOSurfaceIsGlobal,
+		[[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithBool:YES],
 							     [NSNumber numberWithUnsignedInteger:(NSUInteger)this->width], (NSString *)kIOSurfaceWidth,
 							     [NSNumber numberWithUnsignedInteger:(NSUInteger)this->height], (NSString *)kIOSurfaceHeight,
 							     [NSNumber numberWithUnsignedInteger:2U], (NSString *)kIOSurfaceBytesPerElement, nil];
