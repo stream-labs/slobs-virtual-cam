@@ -1,8 +1,6 @@
-#cmake_minimum_required(VERSION 3.0)
-project(slobs-virtual-cam)
+cmake_minimum_required(VERSION 3.22...3.25)
 
-find_package(FFmpeg REQUIRED
-	COMPONENTS avcodec avfilter avdevice avutil swscale avformat swresample)
+find_package(FFmpeg REQUIRED COMPONENTS avcodec avdevice avutil avformat)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

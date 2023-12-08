@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.22...3.25)
 
-project(slobs-virtual-cam)
+target_enable_feature(mac-virtualcam "macOS Virtual Camera support")
 
 if (WIN32)
     add_subdirectory(windows/obs-virtual-cam)
