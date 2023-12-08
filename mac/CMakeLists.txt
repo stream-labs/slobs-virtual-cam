@@ -61,4 +61,11 @@ install(DIRECTORY "${PROJECT_SOURCE_DIR}/" DESTINATION "./data/obs-plugins/slobs
 	PATTERN "vcam-assistant" EXCLUDE
 	PATTERN "data" EXCLUDE)
 
-install_obs_plugin_with_data(slobs-virtual-cam data)
+set_target_properties_obs(
+	slobs-virtual-cam
+	PROPERTIES FOLDER plugins
+				PREFIX ""
+				LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../"
+				XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES
+				XCODE_ATTRIBUTE_CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION YES
+				XCODE_ATTRIBUTE_GCC_WARN_SHADOW YES)
