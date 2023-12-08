@@ -16,6 +16,9 @@ add_subdirectory(vcam-ipc)
 add_subdirectory(vcam-plugin)
 add_subdirectory(vcam-utils)
 
+add_library(slobs-vritual-cam MODULE)
+add_library(OBS::slobs-vritual-cam ALIAS slobs-vritual-cam)
+
 include_directories(
 	${CMAKE_SOURCE_DIR}/libobs
 	"${vcam-ipc_SOURCE_DIR}/include/"
@@ -51,13 +54,13 @@ target_link_libraries(
 	${FFMPEG_LIBRARIES}
 )
 
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/" DESTINATION "./data/obs-plugins/slobs-virtual-cam" USE_SOURCE_PERMISSIONS
-	FILES_MATCHING PATTERN "*.sh"
-	PATTERN "vcam-ipc" EXCLUDE
-	PATTERN "vcam-utils" EXCLUDE
-	PATTERN "vcam-plugin" EXCLUDE
-	PATTERN "vcam-assistant" EXCLUDE
-	PATTERN "data" EXCLUDE)
+# install(DIRECTORY "${PROJECT_SOURCE_DIR}/" DESTINATION "./data/obs-plugins/slobs-virtual-cam" USE_SOURCE_PERMISSIONS
+# 	FILES_MATCHING PATTERN "*.sh"
+# 	PATTERN "vcam-ipc" EXCLUDE
+# 	PATTERN "vcam-utils" EXCLUDE
+# 	PATTERN "vcam-plugin" EXCLUDE
+# 	PATTERN "vcam-assistant" EXCLUDE
+# 	PATTERN "data" EXCLUDE)
 
 set_target_properties_obs(
 	slobs-virtual-cam
