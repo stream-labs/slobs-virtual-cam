@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.22...3.25)
 
+legacy_check()
+
 find_package(FFmpeg REQUIRED COMPONENTS avcodec avdevice avutil avformat)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -11,13 +13,13 @@ find_library(IOSURF IOSurface)
 find_library(COCOA Cocoa)
 find_library(GLKIT GLKit)
 
+add_library(slobs-vritual-cam MODULE)
+add_library(OBS::slobs-vritual-cam ALIAS slobs-vritual-cam)
+
 add_subdirectory(vcam-assistant)
 add_subdirectory(vcam-ipc)
 add_subdirectory(vcam-plugin)
 add_subdirectory(vcam-utils)
-
-add_library(slobs-vritual-cam MODULE)
-add_library(OBS::slobs-vritual-cam ALIAS slobs-vritual-cam)
 
 include_directories(
 	${CMAKE_SOURCE_DIR}/libobs
@@ -37,9 +39,7 @@ set(PROJECT_SOURCE
 	"${PROJECT_SOURCE_DIR}/vcam.hpp"
 )
 
-add_library(${PROJECT_NAME} MODULE
-	${PROJECT_SOURCE}
-)
+target_sources( slobs-vritual-cam PRIVATE ${PROJECT_SOURCE})
 
 target_link_libraries(
     slobs-virtual-cam
