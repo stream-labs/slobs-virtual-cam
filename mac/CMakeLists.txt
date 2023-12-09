@@ -13,8 +13,8 @@ find_library(IOSURF IOSurface)
 find_library(COCOA Cocoa)
 find_library(GLKIT GLKit)
 
-add_library(slobs-vritual-cam MODULE)
-add_library(OBS::slobs-vritual-cam ALIAS slobs-vritual-cam)
+add_library(slobs-virtual-cam MODULE)
+add_library(OBS::slobs-virtual-cam ALIAS slobs-virtual-cam)
 
 add_subdirectory(vcam-assistant)
 add_subdirectory(vcam-ipc)
@@ -39,7 +39,7 @@ set(PROJECT_SOURCE
 	"${PROJECT_SOURCE_DIR}/vcam.hpp"
 )
 
-target_sources( slobs-vritual-cam PRIVATE ${PROJECT_SOURCE})
+target_sources( slobs-virtual-cam PRIVATE ${PROJECT_SOURCE})
 
 target_link_libraries(
     slobs-virtual-cam
